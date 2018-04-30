@@ -18,7 +18,14 @@ package org.tessatech.tessa.framework.util;
 
 import org.junit.Test;
 import org.tessatech.tessa.framework.exception.logic.ValidationException;
+import org.tessatech.tessa.framework.exception.system.InternalException;
 import org.tessatech.tessa.framework.util.validation.RequestValidationUtils;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 public class RequestValidationUtilsTest
 {
@@ -26,37 +33,247 @@ public class RequestValidationUtilsTest
 	RequestValidationUtils util = RequestValidationUtils.getInstance();
 
 	@Test(expected = ValidationException.class)
-	public void isNull()
+	public void isNotNull_Exception_Null()
 	{
 		util.isNotNull("TestField", null);
 	}
 
 	@Test
-	public void isNotNull()
+	public void isNotNull_Success()
 	{
 		util.isNotNull("TestField", "not null");
 	}
 
 	@Test
-	public void isNotEmpty()
+	public void isNotEmpty_Success()
 	{
-		util.isNotNull("TestField", "not empty");
+		util.isNotEmpty("TestField", "not empty");
+	}
+
+	@Test
+	public void isNotEmpty_Success_Whitespace()
+	{
+		util.isNotEmpty("TestField", "  ");
 	}
 
 	@Test(expected = ValidationException.class)
-	public void isEmpty()
+	public void isNotEmpty_Empty()
 	{
-		util.isNotNull("TestField", "not empty");
+		util.isNotEmpty("TestField", "");
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isNotEmpty_Null()
+	{
+		util.isNotEmpty("TestField", null);
 	}
 
 	@Test
-	public void isNotTrimmedEmpty()
+	public void isNotTrimmedEmpty_Success()
 	{
+		util.isNotTrimmedEmpty("TestField", "testValue");
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isNotTrimmedEmpty_TrimmedEmpty()
+	{
+		util.isNotTrimmedEmpty("TestField", "   ");
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isNotTrimmedEmpty_Empty()
+	{
+		util.isNotTrimmedEmpty("TestField", "");
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isNotTrimmedEmpty_Null()
+	{
+		util.isNotTrimmedEmpty("TestField", null);
 	}
 
 	@Test
-	public void isGreaterThan()
+	public void isGreaterThan_GreaterThan()
 	{
 		util.isGreaterThan("TestField", 5, 4);
 	}
+
+	@Test(expected = ValidationException.class)
+	public void isGreaterThan_Exception_LessThan()
+	{
+		util.isGreaterThan("TestField", 5, 6);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isGreaterThan_Exception_Equal()
+	{
+		util.isGreaterThan("TestField", 5, 5);
+	}
+
+	@Test
+	public void isGreaterThanOrEqualTo_GreaterThan()
+	{
+		util.isGreaterThanOrEqualTo("TestField", 5, 4);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isGreaterThanOrEqualTo_Exception_LessThan()
+	{
+		util.isGreaterThanOrEqualTo("TestField", 5, 6);
+	}
+
+	@Test
+	public void isGreaterThanOrEqualTo_Exception_Equal()
+	{
+		util.isGreaterThanOrEqualTo("TestField", 5, 5);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isEqualTo_GreaterThan()
+	{
+		util.isEqualTo("TestField", 5, 4);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isEqualTo_LessThan()
+	{
+		util.isEqualTo("TestField", 5, 6);
+	}
+
+	@Test
+	public void isEqualTo_Equal()
+	{
+		util.isEqualTo("TestField", 5, 5);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isLessThanOrEqualTo_GreaterThan()
+	{
+		util.isLessThanOrEqualTo("TestField", 5, 4);
+	}
+
+	@Test
+	public void isLessThanOrEqualTo_LessThan()
+	{
+		util.isLessThanOrEqualTo("TestField", 5, 6);
+	}
+
+	@Test
+	public void isLessThanOrEqualTo_Equal()
+	{
+		util.isLessThanOrEqualTo("TestField", 5, 5);
+	}
+
+
+	@Test(expected = ValidationException.class)
+	public void isLessThan_GreaterThan()
+	{
+		util.isLessThan("TestField", 5, 4);
+	}
+
+	@Test
+	public void isLessThan_LessThan()
+	{
+		util.isLessThan("TestField", 5, 6);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isLessThan_Equal()
+	{
+		util.isLessThan("TestField", 5, 5);
+	}
+
+	@Test
+	public void isInCollection_True()
+	{
+		List<String> list = Arrays .asList("a", "b", "c");
+
+		util.isInCollection("TestField", "a", list);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isInCollection_False()
+	{
+		List<String> list = Arrays .asList("a", "b", "c");
+
+		util.isInCollection("TestField", "d", list);
+	}
+
+	@Test
+	public void isInArray_True()
+	{
+		String[] list = new String[] { "a", "b", "c"};
+
+		util.isInArray("TestField", "a", list);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isInArray_False()
+	{
+		String[] list = new String[] { "a", "b", "c"};
+
+		util.isInArray("TestField", "d", list);
+	}
+
+	@Test
+	public void isParseable_True()
+	{
+		float result = util.isParsable("testField", "5.02", Float.class);
+		assertEquals(5.02, result, 0.0001);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isParseable_False()
+	{
+		util.isParsable("testField", "5.02", Long.class);
+	}
+
+	enum TestEnum
+	{
+		A, B, C;
+	}
+
+	@Test
+	public void isInEnumeration_True()
+	{
+		TestEnum val = util.isInEnumeration("TestField", "A", TestEnum.class);
+		assertEquals(TestEnum.A, val);
+	}
+
+	@Test
+	public void isInEnumeration_Uppercases()
+	{
+		TestEnum val = util.isInEnumeration("TestField", "a", TestEnum.class);
+		assertEquals(TestEnum.A, val);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isInEnumeration_False()
+	{
+		util.isInEnumeration("TestField", "D", TestEnum.class);
+	}
+
+	@Test
+	public void areTestValuesValid()
+	{
+		List<String> list = Arrays .asList("a", "b", "c");
+		util.areTestValuesValid(list);
+	}
+
+	@Test(expected = InternalException.class)
+	public void areTestValuesValid_NulList()
+	{
+		List<String> list = null;
+		util.areTestValuesValid(list);
+	}
+
+	@Test(expected = InternalException.class)
+	public void areTestValuesValid_NulValue()
+	{
+		List<String> list = Arrays .asList("a", "b", null, "c");
+		util.areTestValuesValid(list);
+	}
+
+
+
 }

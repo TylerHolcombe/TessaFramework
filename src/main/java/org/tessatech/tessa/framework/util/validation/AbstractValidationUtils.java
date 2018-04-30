@@ -87,7 +87,7 @@ abstract class AbstractValidationUtils
 
 		isTestValueValid(testValue);
 
-		if (fieldValue.compareTo(testValue) == 0)
+		if (fieldValue.compareTo(testValue) != 0)
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The only acceptable value was " + testValue);
 		}
@@ -123,9 +123,9 @@ abstract class AbstractValidationUtils
 
 		areTestValuesValid(testValues);
 
-		if (testValues.contains(fieldValue))
+		if (!testValues.contains(fieldValue))
 		{
-			throw generateExceptionForMessage("Field: " + fieldName + " was not of an acceptable value. Acceptable values are: " + Arrays.toString(testValues.toArray()));
+			throw generateExceptionForMessage("Field: " + fieldName + " did not contain an acceptable value. Acceptable values are: " + Arrays.toString(testValues.toArray()));
 		}
 	}
 
