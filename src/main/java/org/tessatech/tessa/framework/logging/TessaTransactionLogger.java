@@ -20,10 +20,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.tessatech.tessa.framework.exception.TessaException;
 import org.tessatech.tessa.framework.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.logging.context.LoggingContextHolder;
+import org.tessatech.tessa.framework.logging.export.LogDataExporter;
 import org.tessatech.tessa.framework.security.context.SecurityContext;
 import org.tessatech.tessa.framework.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.transaction.context.TransactionContext;
@@ -44,6 +47,12 @@ public class TessaTransactionLogger
 	private static final Logger logger = LogManager.getLogger("org.tessatech.transaction.logger");
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+	@Autowired
+	private LogDataExporter logDataExporter;
+
+	@Value("${log.export.enabled:false}")
+	private boolean exportEnabled = false;
 
 	public void logTransaction(ResponseEntity<TessaWebserviceResponse> responseEntity)
 	{
@@ -76,7 +85,14 @@ public class TessaTransactionLogger
 		}
 
 
-		logger.info(gson.toJson(object));
+		String logMessage = gson.toJson(object);
+
+		logger.info(logMessage);
+
+		if(exportEnabled)
+		{
+			logDataExporter.exportLogMessage(logMessage);
+		}
 	}
 
 	private void addSecurityContextFields(Optional<SecurityContext> securityContextOptional, JsonObject object)
@@ -126,9 +142,9 @@ public class TessaTransactionLogger
 		LoggingContext loggingContext = loggingContextOptional.get();
 
 		long endTime = System.currentTimeMillis();
-		addIfNotNull(object, "startTime", String.valueOf(loggingContext.getStartTime()));
-		addIfNotNull(object, "endTime", String.valueOf(endTime));
-		addIfNotNull(object, "runtime", String.valueOf(endTime - loggingContext.getStartTime()));
+		addIfNotNull(object, "startTime",loggingContext.getStartTime());
+		addIfNotNull(object, "endTime", endTime);
+		addIfNotNull(object, "runtime", (endTime - loggingContext.getStartTime()));
 
 		object.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
 		object.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
@@ -179,6 +195,22 @@ public class TessaTransactionLogger
 		}
 	}
 
+	private void addIfNotNull(JsonObject object, String key, Number value)
+	{
+		if(key != null && value != null)
+		{
+			object.addProperty(key, value);
+		}
+	}
+
+	private void addIfNotNull(JsonObject object, String key, Boolean value)
+	{
+		if(key != null && value != null)
+		{
+			object.addProperty(key, value);
+		}
+	}
+
 	private JsonObject getKeyValueJson(Set<Map.Entry<String, Object>> kvPairs)
 	{
 		if (kvPairs != null && kvPairs.size() > 0)
@@ -202,7 +234,7 @@ public class TessaTransactionLogger
 			JsonObject runtimesJson = new JsonObject();
 			for(Map.Entry<String, Long> pair : runtimePairs)
 			{
-				addIfNotNull(runtimesJson, pair.getKey(), pair.getValue());
+				addIfNotNull(runtimesJson, pair.getKey(), pair.getValue().longValue());
 			}
 
 			return runtimesJson;
