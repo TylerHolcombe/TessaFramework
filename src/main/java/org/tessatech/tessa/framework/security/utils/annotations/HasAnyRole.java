@@ -27,5 +27,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HasAnyRole
 {
-	String[] authorizedRoles() default SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
+	String[] authorizedRoles();
 }

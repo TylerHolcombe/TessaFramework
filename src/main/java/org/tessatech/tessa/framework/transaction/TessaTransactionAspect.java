@@ -104,7 +104,7 @@ public class TessaTransactionAspect
 
 	private void endTransaction(ResponseEntity<TessaWebserviceResponse> response)
 	{
-		transactionLogger.logTransaction(response.getBody());
+		transactionLogger.logTransaction(response);
 
 		LoggingContextHolder.clearContext();
 		TransactionContextHolder.clearContext();
@@ -113,7 +113,7 @@ public class TessaTransactionAspect
 
 	private ResponseEntity<TessaWebserviceResponse> handleError(Throwable throwable)
 	{
-		TessaException mappedException = exceptionMapper.mapUnhandledException(throwable);
+		TessaException mappedException = exceptionMapper.mapExceptionIntoTessaException(throwable);
 		LoggingContextHolder.getContextOptional().ifPresent(context -> context.addThrowable(mappedException));
 		return restServiceMapper.mapTessaExceptionResponse(mappedException);
 	}

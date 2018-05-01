@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.http.ResponseEntity;
 import org.tessatech.tessa.framework.exception.TessaException;
 import org.tessatech.tessa.framework.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.logging.context.LoggingContextHolder;
@@ -44,7 +45,7 @@ public class TessaTransactionLogger
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	public void logTransaction(TessaWebserviceResponse response)
+	public void logTransaction(ResponseEntity<TessaWebserviceResponse> responseEntity)
 	{
 		JsonObject object = new JsonObject();
 
@@ -65,9 +66,13 @@ public class TessaTransactionLogger
 			loggedException = addLoggingContextFields(LoggingContextHolder.getContextOptional(), object, loggedException);
 		}
 
-		if (doesResponseContainAnError(response) && !loggedException)
+		if (doesResponseContainAnError(responseEntity) && !loggedException)
 		{
-			addResponseFields(response, object);
+			addResponseFields(responseEntity.getBody(), object);
+		}
+		else if (responseEntity != null)
+		{
+			addIfNotNull(object, "httpStatusCode", responseEntity.getStatusCodeValue());
 		}
 
 
@@ -143,9 +148,9 @@ public class TessaTransactionLogger
 		return loggedException;
 	}
 
-	private boolean doesResponseContainAnError(TessaWebserviceResponse response)
+	private boolean doesResponseContainAnError(ResponseEntity<TessaWebserviceResponse> response)
 	{
-		return response != null && response.getTessaError() != null;
+		return response != null && response.getBody() != null && response.getBody().getTessaError() != null;
 	}
 
 	private void addTessaException(JsonObject object, TessaException throwable)

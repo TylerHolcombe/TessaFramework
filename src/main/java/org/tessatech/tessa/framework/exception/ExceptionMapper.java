@@ -16,15 +16,27 @@
 
 package org.tessatech.tessa.framework.exception;
 
+import org.hibernate.HibernateException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.exception.system.DatabaseException;
 import org.tessatech.tessa.framework.exception.system.UnknownException;
 
 @Component
 public class ExceptionMapper
 {
-	public static TessaException mapUnhandledException(Throwable throwable)
+	public static TessaException mapExceptionIntoTessaException(Throwable throwable)
 	{
-		throw new UnknownException("Throwable mapped into UnknownException via the ExceptionMapper.", throwable);
+		if(throwable instanceof TessaException)
+		{
+			return (TessaException) throwable;
+		}
+		else if (throwable instanceof DataAccessException || throwable instanceof HibernateException)
+		{
+			return new DatabaseException("A database issue occurred.", throwable);
+		}
+
+		return new UnknownException("Throwable mapped into UnknownException via the ExceptionMapper.", throwable);
 	}
 
 }

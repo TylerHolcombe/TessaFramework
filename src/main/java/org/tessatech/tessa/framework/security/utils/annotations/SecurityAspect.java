@@ -16,13 +16,23 @@
 
 package org.tessatech.tessa.framework.security.utils.annotations;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.security.utils.SecurityUtils;
+import org.tessatech.tessa.framework.transaction.TessaTransactionAspect;
 
+@Aspect
+@Component
 public class SecurityAspect
 {
+
+	private static final Logger logger = LogManager.getLogger(SecurityAspect.class);
 
 	@Pointcut("execution(public * *(..))")
 	void anyPublicMethod()
@@ -32,24 +42,27 @@ public class SecurityAspect
 	@Around("anyPublicMethod() && @annotation(hasAllRoles)")
 	public Object hasAllRoles(ProceedingJoinPoint proceedingJoinPoint, HasAllRoles hasAllRoles) throws Throwable
 	{
+		logger.debug("Checking user for roles...");
 		SecurityUtils.validateUserHasAllRoles(hasAllRoles.authorizedRoles());
-
+		logger.debug("User has required roles.");
 		return proceedingJoinPoint.proceed();
 	}
 
 	@Around("anyPublicMethod() && @annotation(hasRole)")
-	public Object hasRole(ProceedingJoinPoint proceedingJoinPoint, hasRole hasRole) throws Throwable
+	public Object hasRole(ProceedingJoinPoint proceedingJoinPoint, HasRole hasRole) throws Throwable
 	{
+		logger.debug("Checking user for roles...");
 		SecurityUtils.validateUserHasRole(hasRole.authorizedRole());
-
+		logger.debug("User has required roles.");
 		return proceedingJoinPoint.proceed();
 	}
 
 	@Around("anyPublicMethod() && @annotation(hasAnyRole)")
 	public Object hasAnyRole(ProceedingJoinPoint proceedingJoinPoint, HasAnyRole hasAnyRole) throws Throwable
 	{
+		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addField("Chcked", "Yes"));
 		SecurityUtils.validateUserHasAnyRole(hasAnyRole.authorizedRoles());
-
+		logger.debug("User has required roles.");
 		return proceedingJoinPoint.proceed();
 	}
 }
