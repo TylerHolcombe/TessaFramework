@@ -19,6 +19,7 @@ package org.tessatech.tessa.framework.transaction.context;
 public class TransactionContext
 {
 	private final String serviceName;
+	private final String serviceOperation;
 	private final String serviceVersion;
 	private final String serviceMethodName;
 
@@ -29,10 +30,11 @@ public class TransactionContext
 	private final String deviceId;
 	private final String deviceType;
 
-	public TransactionContext(String serviceName, String serviceVersion, String serviceMethodName, String requestId,
+	public TransactionContext(String serviceName, String serviceOperation, String serviceVersion, String serviceMethodName, String requestId,
 							  String correlationId, long internalTraceId, String deviceId, String deviceType)
 	{
 		this.serviceName = serviceName;
+		this.serviceOperation = serviceOperation;
 		this.serviceVersion = serviceVersion;
 		this.serviceMethodName = serviceMethodName;
 		this.requestId = requestId;
@@ -45,6 +47,11 @@ public class TransactionContext
 	public String getServiceName()
 	{
 		return serviceName;
+	}
+
+	public String getServiceOperation()
+	{
+		return serviceOperation;
 	}
 
 	public String getServiceVersion()

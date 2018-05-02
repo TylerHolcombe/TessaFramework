@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 public @interface TessaTransaction
 {
 	String serviceName() default "unknown";
+	String serviceOperation() default "*";
 	String serviceVersion() default "unknown";
 	String serviceMethodName() default "unknown";
 

@@ -125,6 +125,7 @@ public class TessaTransactionLogger
 		TransactionContext transactionContext = transactionContextOptional.get();
 
 		addIfNotNull(object, "serviceName", transactionContext.getServiceName());
+		addIfNotNull(object, "serviceOperation", transactionContext.getServiceOperation());
 		addIfNotNull(object, "serviceVersion", transactionContext.getServiceVersion());
 		addIfNotNull(object, "serviceMethodName", transactionContext.getServiceMethodName());
 

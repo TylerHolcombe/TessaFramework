@@ -56,7 +56,7 @@ public class RestServiceMapper
 
 		long internalTraceId = UniqueIdentifierUtils.getUniqueId();
 
-		return new TransactionContext(transaction.serviceName(), transaction.serviceVersion(),
+		return new TransactionContext(transaction.serviceName(), transaction.serviceOperation(), transaction.serviceVersion(),
 				transaction.serviceMethodName(), headers.getRequestId(), headers.getCorrelationId(),
 				internalTraceId, headers.getDeviceId(),
 				headers.getDeviceType());
