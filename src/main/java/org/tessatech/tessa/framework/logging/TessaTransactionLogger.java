@@ -133,6 +133,7 @@ public class TessaTransactionLogger
 		addIfNotNull(object, "requestId", transactionContext.getRequestId());
 		addIfNotNull(object, "correlationId", transactionContext.getCorrelationId());
 		addIfNotNull(object, "internalTraceId", transactionContext.getInternalTraceId());
+		addIfNotNull(object, "sessionId", transactionContext.getSessionId());
 
 		addIfNotNull(object, "deviceId", transactionContext.getDeviceId());
 		addIfNotNull(object, "deviceType", transactionContext.getDeviceType());

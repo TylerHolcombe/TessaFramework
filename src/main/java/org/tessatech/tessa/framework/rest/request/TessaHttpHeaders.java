@@ -22,9 +22,10 @@ public class TessaHttpHeaders
 {
 	private static final String REQUEST_ID = "X-Request-ID";
 	private static final String CORRELATION_ID = "X-Correlation-ID";
+	private static final String SESSION_ID = "X-Session-ID";
 	private static final String INTERNAL_TRACE_ID = "INTERNAL-TRACE-ID";
 
-	private static final String DEVICE_ID = "Device-Id";
+	private static final String DEVICE_ID = "Device-ID";
 	private static final String DEVICE_TYPE = "Device-Type";
 
 
@@ -53,6 +54,16 @@ public class TessaHttpHeaders
 	public void setCorrelationId(String value)
 	{
 		headers.add(CORRELATION_ID, value);
+	}
+
+	public String getSessionId()
+	{
+		return headers.getFirst(SESSION_ID);
+	}
+
+	public void setSessionId(String value)
+	{
+		headers.add(SESSION_ID, value);
 	}
 
 	public String getInternalTraceId()
