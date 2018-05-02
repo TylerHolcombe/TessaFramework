@@ -166,6 +166,25 @@ abstract class AbstractValidationUtils
 		}
 	}
 
+	public void isSanitized(String fieldName, String fieldValue, SanitizeRegex sanatizationRegex)
+	{
+		isNotTrimmedEmpty(fieldName, fieldValue);
+
+		if(!fieldValue.matches(sanatizationRegex.getRegex()))
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
+		}
+	}
+
+	public void isSanitized(String fieldName, String fieldValue, String sanatizationRegex)
+	{
+		isNotTrimmedEmpty(fieldName, fieldValue);
+
+		if(!fieldValue.matches(sanatizationRegex))
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
+		}
+	}
 
 	public void isTestValueValid(Object testValue)
 	{

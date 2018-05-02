@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.tessatech.tessa.framework.exception.logic.ValidationException;
 import org.tessatech.tessa.framework.exception.system.InternalException;
 import org.tessatech.tessa.framework.util.validation.RequestValidationUtils;
+import org.tessatech.tessa.framework.util.validation.SanitizeRegex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -252,6 +253,31 @@ public class RequestValidationUtilsTest
 	{
 		util.isInEnumeration("TestField", "D", TestEnum.class);
 	}
+
+	@Test
+	public void isSanitized_True()
+	{
+		util.isSanitized("Test", "abcABC123", SanitizeRegex.ALPHA_NUMERIC_ONLY);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isSanitized_False()
+	{
+		util.isSanitized("Test", "abcABC123}", SanitizeRegex.ALPHA_NUMERIC_ONLY);
+	}
+
+	@Test
+	public void isSanitizedRegex_True()
+	{
+		util.isSanitized("Test", "abcABC123", SanitizeRegex.ALPHA_NUMERIC_ONLY.getRegex());
+	}
+
+	@Test(expected = ValidationException.class)
+	public void isSanitizedRegex_False()
+	{
+		util.isSanitized("Test", "abcABC123}", SanitizeRegex.ALPHA_NUMERIC_ONLY.getRegex());
+	}
+
 
 	@Test
 	public void areTestValuesValid()
