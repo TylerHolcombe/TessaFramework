@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.exception.util.ThrowableAdapterFinderWrapper;
-import org.tessatech.tessa.framework.core.logging.TessaTransactionLogger;
+import org.tessatech.tessa.framework.core.logging.TessaLogManager;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.security.SecurityManager;
@@ -56,7 +56,7 @@ public class TessaTransactionAspect
 	private ThrowableAdapterFinderWrapper throwableAdapterFinderWrapper;
 
 	@Autowired
-	private TessaTransactionLogger transactionLogger;
+	private TessaLogManager logManager;
 
 	@Pointcut("execution(public * *(..))")
 	void anyPublicMethod()
@@ -72,9 +72,9 @@ public class TessaTransactionAspect
 		{
 			try
 			{
-				beginTransaction(tessaTransaction, getHttpHeadersFromRequest(proceedingJoinPoint));
+				beginTransaction(tessaTransaction, getRequestEntity(proceedingJoinPoint));
 
-				response = getTessaResponseEntityFromResponse(proceedingJoinPoint, proceedingJoinPoint.proceed());
+				response = getResponseEntity(proceedingJoinPoint, proceedingJoinPoint.proceed());
 
 			}
 			catch (Throwable throwable)
@@ -106,7 +106,7 @@ public class TessaTransactionAspect
 
 	private void endTransaction(ResponseEntity<?> response)
 	{
-		transactionLogger.logTransaction(response);
+		logManager.logTransaction(response);
 
 		LoggingContextHolder.clearContext();
 		TransactionContextHolder.clearContext();
@@ -121,7 +121,7 @@ public class TessaTransactionAspect
 	}
 
 
-	private RequestEntity getHttpHeadersFromRequest(ProceedingJoinPoint joinPoint)
+	private RequestEntity getRequestEntity(ProceedingJoinPoint joinPoint)
 	{
 		if (joinPoint != null && joinPoint.getArgs() != null && joinPoint.getArgs().length > 0)
 		{
@@ -137,7 +137,7 @@ public class TessaTransactionAspect
 		throw new InternalException("Could not apply @TessaTransaction to a serviceMethodName without a RequestEntity parameter");
 	}
 
-	private ResponseEntity<?> getTessaResponseEntityFromResponse(ProceedingJoinPoint joinPoint, Object methodCallReponse)
+	private ResponseEntity<?> getResponseEntity(ProceedingJoinPoint joinPoint, Object methodCallReponse)
 	{
 		if (methodCallReponse instanceof ResponseEntity)
 		{

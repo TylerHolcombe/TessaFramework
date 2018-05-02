@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.logging;
+package org.tessatech.tessa.framework.rest.logging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
+import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.core.logging.LogMessageBuilder;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
@@ -45,20 +47,20 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class TessaTransactionLogger
+public class RestLogMessageBuilder implements LogMessageBuilder
 {
-	private static final Logger logger = LogManager.getLogger("org.tessatech.transaction.logger");
+
+	private static final Logger logger = LogManager.getLogger(RestLogMessageBuilder.class);
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	@Autowired
 	private LogDataExporter logDataExporter;
 
-	@Value("${log.export.enabled:false}")
-	private boolean exportEnabled = false;
-
-	public void logTransaction(ResponseEntity<?> responseEntity)
+	public String buildTransactionLog(Object response)
 	{
+		ResponseEntity<?> responseEntity = convertResponseIntoResponseEntity(response);
+
 		JsonObject object = new JsonObject();
 
 		if (TransactionContextHolder.getContextOptional().isPresent())
@@ -85,14 +87,18 @@ public class TessaTransactionLogger
 		}
 
 
-		String logMessage = gson.toJson(object);
+		return gson.toJson(object);
+	}
 
-		logger.info(logMessage);
-
-		if (exportEnabled)
+	private ResponseEntity<?> convertResponseIntoResponseEntity(Object response)
+	{
+		if(response instanceof ResponseEntity)
 		{
-			logDataExporter.exportLogMessage(logMessage);
+			return (ResponseEntity) response;
 		}
+
+		logger.error("Attempting to log details from a class that is not a ResponseEntity. Log data may be incomplete.");
+		return null;
 	}
 
 	private void addSecurityContextFields(Optional<SecurityContext> securityContextOptional, JsonObject object)
