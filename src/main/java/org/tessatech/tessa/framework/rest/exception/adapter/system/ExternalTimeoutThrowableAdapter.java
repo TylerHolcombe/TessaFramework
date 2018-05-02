@@ -14,39 +14,40 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.system;
+package org.tessatech.tessa.framework.rest.exception.adapter.system;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.core.exception.details.ExternalExceptionAdapter;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
 import org.tessatech.tessa.framework.core.exception.system.ExternalException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.core.exception.system.ExternalTimeoutException;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
-public class ExternalThrowableAdapter extends RestThrowableAdapter implements ExternalExceptionAdapter
+public class ExternalTimeoutThrowableAdapter extends RestThrowableAdapter implements ExternalExceptionAdapter
 {
-	public ExternalThrowableAdapter()
+	public ExternalTimeoutThrowableAdapter()
 	{
-		super(ExternalException.class);
+		super(ExternalTimeoutException.class);
 	}
 
 	@Override
 	public HttpStatus getHttpStatus()
 	{
-		return TessaExceptionCodes.EXTERNAL_ERROR_HTTP_STATUS;
+		return TessaExceptionCodes.EXTERNAL_TIMEOUT_HTTP_STATUS;
 	}
 
 	@Override
 	public long getExceptionCode(Throwable throwable)
 	{
-		return TessaExceptionCodes.EXTERNAL_ERROR_CODE;
+		return TessaExceptionCodes.EXTERNAL_TIMEOUT_CODE;
 	}
 
 	@Override
 	public String getExceptionMessage(Throwable throwable)
 	{
-		return TessaExceptionCodes.EXTERNAL_ERROR_MESSAGE;
+		return TessaExceptionCodes.EXTERNAL_TIMEOUT_MESSAGE;
 	}
 
 	@Override

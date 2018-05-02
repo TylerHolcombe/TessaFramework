@@ -14,11 +14,11 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details;
+package org.tessatech.tessa.framework.rest.exception.adapter;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.HttpStatus;
-import org.tessatech.tessa.framework.core.exception.details.ThrowableAdapter;
+import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 
 public abstract class RestThrowableAdapter extends ThrowableAdapter
 {

@@ -14,38 +14,43 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.system;
+package org.tessatech.tessa.framework.rest.exception.adapter.system;
 
+import org.hibernate.HibernateException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
-import org.tessatech.tessa.framework.core.exception.system.RemovedException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.core.exception.system.DatabaseException;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.logic.DataNotFoundException;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
+
+import java.sql.SQLException;
 
 @Component
-public class RemovedThrowableAdapter extends RestThrowableAdapter
+public class DatabaseThrowableAdapter extends RestThrowableAdapter
 {
-	public RemovedThrowableAdapter()
+	public DatabaseThrowableAdapter()
 	{
-		super(RemovedException.class);
+		super(DatabaseException.class, SQLException.class, DataAccessException.class, HibernateException.class);
 	}
 
 	@Override
 	public HttpStatus getHttpStatus()
 	{
-		return TessaExceptionCodes.REMOVED_HTTP_STATUS;
+		return TessaExceptionCodes.DATABASE_ERROR_HTTP_STATUS;
 	}
 
 	@Override
 	public long getExceptionCode(Throwable throwable)
 	{
-		return TessaExceptionCodes.REMOVED_CODE;
+		return TessaExceptionCodes.DATABASE_ERROR_CODE;
 	}
 
 	@Override
 	public String getExceptionMessage(Throwable throwable)
 	{
-		return TessaExceptionCodes.REMOVED_MESSAGE;
+		return TessaExceptionCodes.DATABASE_ERROR_MESSAGE;
 	}
 
 }

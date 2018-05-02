@@ -14,10 +14,16 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.exception.details;
+package org.tessatech.tessa.framework.core.security.utils.annotation;
 
-public interface ExternalExceptionAdapter
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HasAnyRole
 {
-	String getExternalExceptionCode(Throwable throwable);
-	String getExternalExceptionMessage(Throwable throwable);
+	String[] authorizedRoles();
 }

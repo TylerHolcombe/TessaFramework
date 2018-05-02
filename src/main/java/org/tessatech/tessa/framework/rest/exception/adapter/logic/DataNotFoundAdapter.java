@@ -14,38 +14,38 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.system;
+package org.tessatech.tessa.framework.rest.exception.adapter.logic;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
-import org.tessatech.tessa.framework.core.exception.system.AuthenticationFailureException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.logic.DataNotFoundException;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
-public class AuthenticationFailureAdapter extends RestThrowableAdapter
+public class DataNotFoundAdapter extends RestThrowableAdapter
 {
-	public AuthenticationFailureAdapter()
+	public DataNotFoundAdapter()
 	{
-		super(AuthenticationFailureException.class);
+		super(DataNotFoundException.class);
 	}
 
 	@Override
 	public HttpStatus getHttpStatus()
 	{
-		return TessaExceptionCodes.AUTH_FAILURE_HTTP_STATUS;
+		return TessaExceptionCodes.NOT_FOUND_HTTP_STATUS;
 	}
 
 	@Override
 	public long getExceptionCode(Throwable throwable)
 	{
-		return TessaExceptionCodes.AUTH_FAILURE_CODE;
+		return TessaExceptionCodes.NOT_FOUND_CODE;
 	}
 
 	@Override
 	public String getExceptionMessage(Throwable throwable)
 	{
-		return TessaExceptionCodes.AUTH_FAILURE_MESSAGE;
+		return TessaExceptionCodes.NOT_FOUND_MESSAGE;
 	}
 
 }

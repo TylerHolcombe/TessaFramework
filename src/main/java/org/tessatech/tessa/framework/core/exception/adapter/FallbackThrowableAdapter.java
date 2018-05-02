@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.exception.details;
+package org.tessatech.tessa.framework.core.exception.adapter;
 
 public class FallbackThrowableAdapter extends ThrowableAdapter
 {

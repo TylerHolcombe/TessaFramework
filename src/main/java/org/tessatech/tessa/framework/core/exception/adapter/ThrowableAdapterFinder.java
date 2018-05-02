@@ -14,13 +14,17 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.exception.details;
+package org.tessatech.tessa.framework.core.exception.adapter;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ThrowableAdapterFinder
 {
+	private static final Logger logger = LogManager.getLogger(ThrowableAdapterFinder.class);
 
 	private static final Map<String, ThrowableAdapter> exceptionsToAdapters = new ConcurrentHashMap<>();
 
@@ -31,7 +35,7 @@ public class ThrowableAdapterFinder
 
 	}
 
-	public static void registerExceptions(ThrowableAdapter adapter, Class... classes)
+	public static void registerAdapter(ThrowableAdapter adapter, Class... classes)
 	{
 		for (Class exception : classes)
 		{
@@ -39,7 +43,7 @@ public class ThrowableAdapterFinder
 		}
 	}
 
-	public static void registerDefaultDetails(ThrowableAdapter adapter, Class... classes)
+	public static void registerDefaultAdapter(ThrowableAdapter adapter, Class... classes)
 	{
 		for (Class exception : classes)
 		{
@@ -52,7 +56,7 @@ public class ThrowableAdapterFinder
 		}
 	}
 
-	public static void registerFallbackExceptionDetails(ThrowableAdapter adapter)
+	public static void registerFallbackAdapter(ThrowableAdapter adapter)
 	{
 		fallbackThrowableAdapter = adapter;
 	}
@@ -77,6 +81,8 @@ public class ThrowableAdapterFinder
 					adapter = exceptionsToAdapters.get(clazz.getCanonicalName());
 					break;
 				}
+
+				clazz = clazz.getSuperclass();
 			}
 
 			if(adapter == null)
@@ -84,8 +90,9 @@ public class ThrowableAdapterFinder
 				adapter = fallbackThrowableAdapter;
 			}
 
-			// Register details so we do not need to look them up again
-			registerExceptions(adapter, throwable.getClass());
+			// Register adapter so we do not need to look them up again
+			registerAdapter(adapter, throwable.getClass());
+			logger.debug("Inserting Entry in ThrowableAdapterFinder for Throwable: " + throwable.getClass().getSimpleName() + " to Adapter: " + adapter.getClass().getSimpleName());
 
 			return adapter;
 		}

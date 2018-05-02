@@ -14,14 +14,14 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.system;
+package org.tessatech.tessa.framework.rest.exception.adapter.system;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
-import org.tessatech.tessa.framework.core.exception.details.ThrowableAdapterFinder;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
 import org.tessatech.tessa.framework.core.exception.system.UnknownException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
 public class UnknownThrowableAdapter extends RestThrowableAdapter
@@ -29,7 +29,7 @@ public class UnknownThrowableAdapter extends RestThrowableAdapter
 	public UnknownThrowableAdapter()
 	{
 		super(UnknownException.class);
-		ThrowableAdapterFinder.registerFallbackExceptionDetails(this);
+		ThrowableAdapterFinder.registerFallbackAdapter(this);
 	}
 
 	@Override

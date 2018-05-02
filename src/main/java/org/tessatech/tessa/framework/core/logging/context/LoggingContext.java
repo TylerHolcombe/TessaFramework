@@ -18,7 +18,6 @@ package org.tessatech.tessa.framework.core.logging.context;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.tessatech.tessa.framework.core.exception.details.ThrowableAdapter;
 
 import java.util.*;
 

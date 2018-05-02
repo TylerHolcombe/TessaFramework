@@ -14,13 +14,13 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.logic;
+package org.tessatech.tessa.framework.rest.exception.adapter.logic;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
 import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
 public class InvalidAuthenticationAdapter extends RestThrowableAdapter

@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details;
+package org.tessatech.tessa.framework.rest.exception.adapter;
 
 import org.springframework.http.HttpStatus;
 

@@ -14,38 +14,38 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.system;
+package org.tessatech.tessa.framework.rest.exception.adapter.system;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
-import org.tessatech.tessa.framework.core.exception.system.NotImplementedException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
-public class NotImplementedAdapter extends RestThrowableAdapter
+public class InternalThrowableAdapter extends RestThrowableAdapter
 {
-	public NotImplementedAdapter()
+	public InternalThrowableAdapter()
 	{
-		super(NotImplementedException.class);
+		super(InternalException.class);
 	}
 
 	@Override
 	public HttpStatus getHttpStatus()
 	{
-		return TessaExceptionCodes.NOT_IMPLEMENTED_HTTP_STATUS;
+		return TessaExceptionCodes.INTERNAL_ERROR_HTTP_STATUS;
 	}
 
 	@Override
 	public long getExceptionCode(Throwable throwable)
 	{
-		return TessaExceptionCodes.NOT_IMPLEMENTED_CODE;
+		return TessaExceptionCodes.INTERNAL_ERROR_CODE;
 	}
 
 	@Override
 	public String getExceptionMessage(Throwable throwable)
 	{
-		return TessaExceptionCodes.NOT_IMPLEMENTED_MESSAGE;
+		return TessaExceptionCodes.INTERNAL_ERROR_MESSAGE;
 	}
 
 }

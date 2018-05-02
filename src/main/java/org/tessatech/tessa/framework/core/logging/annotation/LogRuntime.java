@@ -14,25 +14,16 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.exception.details;
+package org.tessatech.tessa.framework.core.logging.annotation;
 
-public abstract class ThrowableAdapter
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LogRuntime
 {
-
-	public ThrowableAdapter(boolean isDefault, Class... exceptionClasses)
-	{
-		if(isDefault)
-		{
-			ThrowableAdapterFinder.registerDefaultDetails(this, exceptionClasses);
-		}
-		else
-		{
-			ThrowableAdapterFinder.registerExceptions(this, exceptionClasses);;
-		}
-	}
-
-	public abstract long getExceptionCode(Throwable throwable);
-	public abstract String getExceptionMessage(Throwable throwable);
-
-
+	boolean debugOnly() default false;
 }

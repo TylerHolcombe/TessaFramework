@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.utils.annotations;
+package org.tessatech.tessa.framework.core.security.utils.annotation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

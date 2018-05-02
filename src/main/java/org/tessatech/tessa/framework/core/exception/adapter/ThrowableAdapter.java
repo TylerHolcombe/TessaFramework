@@ -14,22 +14,25 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.main;
+package org.tessatech.tessa.framework.core.exception.adapter;
 
-import org.junit.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-
-@SpringBootApplication
-@ComponentScan("org.tessatech")
-public class ApplicationMainTest
+public abstract class ThrowableAdapter
 {
 
-	public static void main(String[] args)
+	public ThrowableAdapter(boolean isDefault, Class... exceptionClasses)
 	{
-		SpringApplication.run(ApplicationMainTest.class, args);
+		if(isDefault)
+		{
+			ThrowableAdapterFinder.registerDefaultAdapter(this, exceptionClasses);
+		}
+		else
+		{
+			ThrowableAdapterFinder.registerAdapter(this, exceptionClasses);;
+		}
 	}
+
+	public abstract long getExceptionCode(Throwable throwable);
+	public abstract String getExceptionMessage(Throwable throwable);
+
 
 }

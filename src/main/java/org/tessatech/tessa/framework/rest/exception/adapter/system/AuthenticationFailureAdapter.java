@@ -14,38 +14,38 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.exception.details.logic;
+package org.tessatech.tessa.framework.rest.exception.adapter.system;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.rest.exception.details.TessaExceptionCodes;
-import org.tessatech.tessa.framework.core.exception.logic.InsufficientAuthorizationException;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.TessaExceptionCodes;
+import org.tessatech.tessa.framework.core.exception.system.AuthenticationFailureException;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 
 @Component
-public class InsufficientAuthorizationAdapter extends RestThrowableAdapter
+public class AuthenticationFailureAdapter extends RestThrowableAdapter
 {
-	public InsufficientAuthorizationAdapter()
+	public AuthenticationFailureAdapter()
 	{
-		super(InsufficientAuthorizationException.class);
+		super(AuthenticationFailureException.class);
 	}
 
 	@Override
 	public HttpStatus getHttpStatus()
 	{
-		return TessaExceptionCodes.INSUFFICIENT_AUTHENTICATION_HTTP_STATUS;
+		return TessaExceptionCodes.AUTH_FAILURE_HTTP_STATUS;
 	}
-	
+
 	@Override
 	public long getExceptionCode(Throwable throwable)
 	{
-		return TessaExceptionCodes.INSUFFICIENT_AUTHORIZATION_CODE;
+		return TessaExceptionCodes.AUTH_FAILURE_CODE;
 	}
 
 	@Override
 	public String getExceptionMessage(Throwable throwable)
 	{
-		return TessaExceptionCodes.INSUFFICIENT_AUTHORIZATION_MESSAGE;
+		return TessaExceptionCodes.AUTH_FAILURE_MESSAGE;
 	}
 
 }

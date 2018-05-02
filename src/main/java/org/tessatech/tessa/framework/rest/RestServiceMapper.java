@@ -25,7 +25,7 @@ import org.tessatech.tessa.framework.core.transaction.TessaTransaction;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 import org.tessatech.tessa.framework.core.util.UniqueIdentifierUtils;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 import org.tessatech.tessa.framework.rest.response.DefaultTessaWebserviceResponse;
 import org.tessatech.tessa.framework.rest.response.TessaError;

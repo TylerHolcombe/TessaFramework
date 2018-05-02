@@ -14,9 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.utils.annotations;
-
-import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
+package org.tessatech.tessa.framework.core.security.utils.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

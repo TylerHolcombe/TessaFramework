@@ -26,16 +26,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.core.exception.details.ThrowableAdapter;
-import org.tessatech.tessa.framework.core.exception.details.ThrowableAdapterFinder;
+import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.core.exception.util.ThrowableAdapterFinderWrapper;
 import org.tessatech.tessa.framework.core.logging.TessaTransactionLogger;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.security.SecurityManager;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.rest.RestServiceMapper;
-import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
+import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 
@@ -51,6 +51,9 @@ public class TessaTransactionAspect
 
 	@Autowired
 	private RestServiceMapper restServiceMapper;
+
+	@Autowired
+	private ThrowableAdapterFinderWrapper throwableAdapterFinderWrapper;
 
 	@Autowired
 	private TessaTransactionLogger transactionLogger;
@@ -110,9 +113,9 @@ public class TessaTransactionAspect
 		SecurityContextHolder.clearContext();
 	}
 
-	private ResponseEntity<TessaWebserviceResponse> handleError(Throwable throwable)
+	public ResponseEntity<TessaWebserviceResponse> handleError(Throwable throwable)
 	{
-		ThrowableAdapter throwableAdapter = ThrowableAdapterFinder.getThrowableAdapter(throwable);
+		ThrowableAdapter throwableAdapter = throwableAdapterFinderWrapper.getThrowableAdapter(throwable);
 		LoggingContextHolder.getContextOptional().ifPresent(context -> context.addThrowable(throwable));
 		return restServiceMapper.mapTessaExceptionResponse((RestThrowableAdapter) throwableAdapter, throwable);
 	}
