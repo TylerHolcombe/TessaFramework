@@ -64,7 +64,7 @@ public class TessaTransactionAspect
 	@Around("anyPublicMethod() && @annotation(tessaTransaction)")
 	public Object tessaTransaction(ProceedingJoinPoint proceedingJoinPoint, TessaTransaction tessaTransaction)
 	{
-		ResponseEntity<TessaWebserviceResponse> response = null;
+		ResponseEntity<?> response = null;
 
 		try
 		{
@@ -102,7 +102,7 @@ public class TessaTransactionAspect
 		securityManager.secureRequest(transaction, requestEntity);
 	}
 
-	private void endTransaction(ResponseEntity<TessaWebserviceResponse> response)
+	private void endTransaction(ResponseEntity<?> response)
 	{
 		transactionLogger.logTransaction(response);
 
@@ -135,21 +135,21 @@ public class TessaTransactionAspect
 		throw new InternalException("Could not apply @TessaTransaction to a serviceMethodName without a RequestEntity parameter");
 	}
 
-	private ResponseEntity<TessaWebserviceResponse> getTessaResponseEntityFromResponse(ProceedingJoinPoint joinPoint, Object methodCallReponse)
+	private ResponseEntity<?> getTessaResponseEntityFromResponse(ProceedingJoinPoint joinPoint, Object methodCallReponse)
 	{
 		if (methodCallReponse instanceof ResponseEntity)
 		{
 			try
 			{
-				return (ResponseEntity<TessaWebserviceResponse>) methodCallReponse;
+				return (ResponseEntity<?>) methodCallReponse;
 			}
 			catch (ClassCastException classCastException)
 			{
-				throw new InternalException("ClassCastException attempting to convert a ResponseEntity into a ResponseEntity<TessaWebserviceResponse. Your body class must implement TessaWebserviceResponse.", classCastException);
+				throw new InternalException("ClassCastException attempting to convert a ResponseEntity into a ResponseEntity.", classCastException);
 			}
 		}
 
-		throw new InternalException("Could not apply @TessaTransaction to a serviceMethodName without a ResponseEntity<TessaWebserviceResponse> response.");
+		throw new InternalException("Could not apply @TessaTransaction to a serviceMethodName without a ResponseEntity<?> response.");
 	}
 
 }

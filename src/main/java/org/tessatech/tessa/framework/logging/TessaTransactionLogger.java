@@ -54,7 +54,7 @@ public class TessaTransactionLogger
 	@Value("${log.export.enabled:false}")
 	private boolean exportEnabled = false;
 
-	public void logTransaction(ResponseEntity<TessaWebserviceResponse> responseEntity)
+	public void logTransaction(ResponseEntity<?> responseEntity)
 	{
 		JsonObject object = new JsonObject();
 
@@ -165,9 +165,10 @@ public class TessaTransactionLogger
 		return loggedException;
 	}
 
-	private boolean doesResponseContainAnError(ResponseEntity<TessaWebserviceResponse> response)
+	private boolean doesResponseContainAnError(ResponseEntity<?> response)
 	{
-		return response != null && response.getBody() != null && response.getBody().getTessaError() != null;
+		return response != null && response.getBody() != null &&
+				response.getBody() instanceof  TessaWebserviceResponse && ((TessaWebserviceResponse) response.getBody()).getTessaError() != null;
 	}
 
 	private void addTessaException(JsonObject object, TessaException throwable)
@@ -265,12 +266,15 @@ public class TessaTransactionLogger
 		return stackTrace;
 	}
 
-	private void addResponseFields(TessaWebserviceResponse response, JsonObject object)
+	private void addResponseFields(Object response, JsonObject object)
 	{
-		TessaError tessaTessaError = response.getTessaError();
-		addIfNotNull(object, "httpStatusCode", tessaTessaError.httpStatus);
-		addIfNotNull(object, "exceptionCode", tessaTessaError.errorCode);
-		addIfNotNull(object, "exceptionMessage", tessaTessaError.errorMessage);
+		if(response instanceof TessaWebserviceResponse)
+		{
+			TessaError tessaTessaError = ((TessaWebserviceResponse) response).getTessaError();
+			addIfNotNull(object, "httpStatusCode", tessaTessaError.httpStatus);
+			addIfNotNull(object, "exceptionCode", tessaTessaError.errorCode);
+			addIfNotNull(object, "exceptionMessage", tessaTessaError.errorMessage);
+		}
 	}
 
 }
