@@ -19,13 +19,13 @@ package org.tessatech.tessa.framework.rest;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.exception.TessaException;
-import org.tessatech.tessa.framework.exception.system.InternalException;
-import org.tessatech.tessa.framework.exception.logic.InvalidRequestException;
-import org.tessatech.tessa.framework.transaction.TessaTransaction;
-import org.tessatech.tessa.framework.transaction.context.TransactionContext;
-import org.tessatech.tessa.framework.transaction.context.TransactionContextHolder;
-import org.tessatech.tessa.framework.util.UniqueIdentifierUtils;
+import org.tessatech.tessa.framework.core.exception.logic.InvalidRequestException;
+import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.core.transaction.TessaTransaction;
+import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
+import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
+import org.tessatech.tessa.framework.core.util.UniqueIdentifierUtils;
+import org.tessatech.tessa.framework.rest.exception.details.RestThrowableAdapter;
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 import org.tessatech.tessa.framework.rest.response.DefaultTessaWebserviceResponse;
 import org.tessatech.tessa.framework.rest.response.TessaError;
@@ -42,7 +42,7 @@ public class RestServiceMapper
 			throw new InternalException("Cannot map a null TessaTransaction annotation into a context.");
 		}
 
-		if(requestEntity == null)
+		if (requestEntity == null)
 		{
 			throw new InternalException("Cannot map a null request into a context.");
 		}
@@ -63,7 +63,7 @@ public class RestServiceMapper
 
 	}
 
-	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(TessaException exception)
+	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(RestThrowableAdapter details, Throwable throwable)
 	{
 		long internalTraceId = 0;
 
@@ -72,12 +72,12 @@ public class RestServiceMapper
 			internalTraceId = TransactionContextHolder.getContextOptional().get().getInternalTraceId();
 		}
 
-		TessaError tessaError = new TessaError(String.valueOf(exception.httpCode.value()), exception.exceptionCode,
-				exception.exceptionMessage, internalTraceId);
+		TessaError tessaError = new TessaError(String.valueOf(details.getHttpStatus()), details.getExceptionCode(throwable),
+				details.getExceptionMessage(throwable), internalTraceId);
 
 		TessaWebserviceResponse response = new DefaultTessaWebserviceResponse(tessaError);
 
 
-		return new ResponseEntity<TessaWebserviceResponse>(response, exception.httpCode);
+		return new ResponseEntity<TessaWebserviceResponse>(response, details.getHttpStatus());
 	}
 }
