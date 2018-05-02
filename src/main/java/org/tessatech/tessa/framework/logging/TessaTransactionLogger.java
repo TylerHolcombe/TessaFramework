@@ -168,7 +168,7 @@ public class TessaTransactionLogger
 	private boolean doesResponseContainAnError(ResponseEntity<?> response)
 	{
 		return response != null && response.getBody() != null &&
-				response.getBody() instanceof  TessaWebserviceResponse && ((TessaWebserviceResponse) response.getBody()).getTessaError() != null;
+				response.getBody() instanceof  TessaWebserviceResponse && ((TessaWebserviceResponse) response.getBody()).getError() != null;
 	}
 
 	private void addTessaException(JsonObject object, TessaException throwable)
@@ -270,7 +270,7 @@ public class TessaTransactionLogger
 	{
 		if(response instanceof TessaWebserviceResponse)
 		{
-			TessaError tessaTessaError = ((TessaWebserviceResponse) response).getTessaError();
+			TessaError tessaTessaError = ((TessaWebserviceResponse) response).getError();
 			addIfNotNull(object, "httpStatusCode", tessaTessaError.httpStatus);
 			addIfNotNull(object, "exceptionCode", tessaTessaError.errorCode);
 			addIfNotNull(object, "exceptionMessage", tessaTessaError.errorMessage);

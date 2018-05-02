@@ -18,16 +18,16 @@ package org.tessatech.tessa.framework.rest.response;
 
 public class DefaultTessaWebserviceResponse implements TessaWebserviceResponse
 {
-	TessaError tessaError;
+	TessaError error;
 
-	public DefaultTessaWebserviceResponse(TessaError tessaError)
+	public DefaultTessaWebserviceResponse(TessaError error)
 	{
-		this.tessaError = tessaError;
+		this.error = error;
 	}
 
 	@Override
-	public TessaError getTessaError()
+	public TessaError getError()
 	{
-		return tessaError;
+		return error;
 	}
 }
