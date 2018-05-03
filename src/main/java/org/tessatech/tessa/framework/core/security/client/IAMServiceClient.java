@@ -57,7 +57,7 @@ public class IAMServiceClient
 	@TessaEvent(eventName = "retrieveLatestSecret", eventGroup = "iam")
 	public Optional<Secret> retrieveLatestSecret()
 	{
-		ExternalCallAttributesBuilder attributes = new ExternalCallAttributesBuilder("/secret", "iam" );
+		ExternalCallAttributesBuilder attributes = new ExternalCallAttributesBuilder("TessaTech LLC","IAM", "/secret", "POST" );
 		try
 		{
 			TessaHttpHeaders headers = new TessaHttpHeaders(EventContextHolder.getContextOptional());
@@ -72,7 +72,7 @@ public class IAMServiceClient
 		catch (Exception e)
 		{
 			logger.error("Error occurred retrieving secret from IAM Service.", e);
-			attributes.buildAndCommit(false);
+			attributes.setThrowable(e).buildAndCommit(false);
 		}
 
 		return Optional.empty();

@@ -26,7 +26,7 @@ import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
 @Component
 public class TessaLogManager
 {
-	private static final Logger logger = LogManager.getLogger("org.tessatech.transaction.logger");
+	private static final Logger logger = LogManager.getLogger(TessaLogManager.class);
 
 	@Value("${log.export.enabled:false}")
 	private boolean exportEnabled = false;

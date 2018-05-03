@@ -48,7 +48,7 @@ public class LoggingContext
 
 	public void addFieldMasked(String key, String value)
 	{
-		keyValueFields.put(key, StringUtils.right(value, 4));
+		keyValueFields.put(key, "****" + StringUtils.right(value, 4));
 	}
 
 	public void addFieldHashed(String key, String value)
@@ -58,15 +58,22 @@ public class LoggingContext
 
 	public void addEmailMasked(String key, String email)
 	{
-		String[] splitEmail = StringUtils.split(email, "@.");
-
 		StringBuilder builder = new StringBuilder();
-		for (String part : splitEmail)
-		{
-			builder.append(StringUtils.left(part, 3));
-		}
+		String[] splitEmail = StringUtils.split(email, "@");
 
-		keyValueFields.put(key, builder.toString());
+		for(String part : splitEmail)
+		{
+			for(String subpart : StringUtils.split(part, "."))
+			{
+				builder.append(StringUtils.left(subpart, 3)).append("**").append(".");
+			}
+
+			builder.deleteCharAt(builder.length() - 1).append("@");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		String masked = builder.toString();
+		masked = masked.substring(0, masked.length() - 2);
+		keyValueFields.put(key, masked);
 	}
 
 	public Set<Map.Entry<String, Object>> getKeyValueFields()

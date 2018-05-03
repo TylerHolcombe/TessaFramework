@@ -31,6 +31,7 @@ import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAda
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
 import org.tessatech.tessa.framework.core.logging.LogMessageBuilder;
+import org.tessatech.tessa.framework.core.logging.context.ExternalCallAttributes;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
@@ -42,6 +43,7 @@ import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter
 import org.tessatech.tessa.framework.rest.response.TessaError;
 import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -184,7 +186,7 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 		object.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
 		object.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
-		object.add("externalCalls", gson.toJsonTree(loggingContext.getExternalLogAttributes()));
+		object.add("externalCalls", getExternalCallsJson(loggingContext.getExternalLogAttributes()));
 
 		Throwable throwable = loggingContext.getThrowable();
 		if (throwable != null)
@@ -279,6 +281,45 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		}
 
 		return null;
+	}
+
+	private JsonArray getExternalCallsJson(List<ExternalCallAttributes> externalCalls)
+	{
+		if(externalCalls != null && externalCalls.size() > 0)
+		{
+			JsonArray arrayOfCalls = new JsonArray();
+			for(ExternalCallAttributes attributes : externalCalls)
+			{
+				arrayOfCalls.add(buildExternalCallJson(attributes));
+			}
+			return arrayOfCalls;
+		}
+
+		return null;
+	}
+
+	private JsonObject buildExternalCallJson(ExternalCallAttributes attributes)
+	{
+		JsonObject externalCall = new JsonObject();
+		addIfNotNull(externalCall, "systemName", attributes.systemName);
+		addIfNotNull(externalCall, "serviceName", attributes.serviceName);
+		addIfNotNull(externalCall, "serviceMethod", attributes.serviceMethod);
+		addIfNotNull(externalCall, "serviceOperation", attributes.serviceOperation);
+		addIfNotNull(externalCall, "serviceVersion", attributes.serviceVersion);
+		addIfNotNull(externalCall, "success", attributes.success);
+		addIfNotNull(externalCall, "httpStatusCode", attributes.httpStatusCode);
+		addIfNotNull(externalCall, "externalResponseCode", attributes.externalResponseCode);
+		addIfNotNull(externalCall, "externalResponseMessage", attributes.externalResponseMessage);
+		addIfNotNull(externalCall, "externalTraceId", attributes.externalTraceId);
+		addIfNotNull(externalCall, "startTime", attributes.startTime);
+		addIfNotNull(externalCall, "endTime", attributes.endTime);
+		addIfNotNull(externalCall, "runtime", attributes.runtime);
+
+		if(attributes.throwable != null)
+		{
+			externalCall.add("stackTrace", getStackTraceJson(attributes.throwable));
+		}
+		return externalCall;
 	}
 
 	private JsonObject getStackTraceJson(Throwable throwable)

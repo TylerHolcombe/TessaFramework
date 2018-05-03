@@ -16,6 +16,8 @@
 
 package org.tessatech.tessa.framework.core.security.provider;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
@@ -23,12 +25,15 @@ import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
 import org.tessatech.tessa.framework.core.security.client.container.Secret;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Optional;
 
 @Component
 public class JWTSecretScheduler implements Runnable
 {
+	private static final Logger logger = LogManager.getLogger(JWTSecretScheduler.class);
+
 	@Autowired
 	private TaskScheduler scheduler;
 
@@ -42,11 +47,14 @@ public class JWTSecretScheduler implements Runnable
 	private boolean isJwtEnabled = true;
 
 	@Override
+	@PostConstruct
 	public void run()
 	{
 		if(!isJwtEnabled)
+		{
+			logger.warn("JWT is disabled - not rescheduling.");
 			return;
-
+		}
 
 		Optional<Secret> optionalSecret = iamServiceClient.retrieveLatestSecret();
 

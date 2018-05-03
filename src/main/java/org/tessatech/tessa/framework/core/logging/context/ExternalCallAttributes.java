@@ -18,23 +18,29 @@ package org.tessatech.tessa.framework.core.logging.context;
 
 public class ExternalCallAttributes
 {
-	public String serviceName;
-	public String serviceVersion;
-	public String serviceMethod;
+	public final String systemName;
+	public final String serviceName;
+	public final String serviceOperation;
+	public final String serviceVersion;
+	public final String serviceMethod;
 
-	public Boolean success;
-	public int httpStatusCode;
-	public String externalResponseCode;
-	public String externalResponseMessage;
-	public String externalTraceId;
+	public final Boolean success;
+	public final Integer httpStatusCode;
+	public final String externalResponseCode;
+	public final String externalResponseMessage;
+	public final String externalTraceId;
 
-	public long startTime;
-	public long endTime;
-	public long runtime;
+	public final Throwable throwable;
 
-	ExternalCallAttributes(String serviceName, String serviceVersion, String serviceMethod, Boolean success, int httpStatusCode, String externalResponseCode, String externalResponseMessage, String externalTraceId, long startTime, long endTime, long runtime)
+	public final long startTime;
+	public final long endTime;
+	public final long runtime;
+
+	ExternalCallAttributes(String systemName, String serviceName, String serviceOperation, String serviceVersion, String serviceMethod, Boolean success, Integer httpStatusCode, String externalResponseCode, String externalResponseMessage, String externalTraceId, long startTime, long endTime, long runtime, Throwable throwable)
 	{
+		this.systemName = systemName;
 		this.serviceName = serviceName;
+		this.serviceOperation = serviceOperation;
 		this.serviceVersion = serviceVersion;
 		this.serviceMethod = serviceMethod;
 		this.success = success;
@@ -45,5 +51,6 @@ public class ExternalCallAttributes
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.runtime = runtime;
+		this.throwable = throwable;
 	}
 }

@@ -16,6 +16,7 @@
 
 package org.tessatech.tessa.framework.core.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.tessatech.tessa.framework.core.exception.logic.ValidationException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
@@ -300,6 +301,27 @@ public class RequestValidationUtilsTest
 		util.areTestValuesValid(list);
 	}
 
+	@Test
+	public void addEmailMasked()
+	{
+		String email = "dank.memes@woah.bro.com";
+		StringBuilder builder = new StringBuilder();
+		String[] splitEmail = StringUtils.split(email, "@");
+
+		for(String part : splitEmail)
+		{
+			for(String subpart : StringUtils.split(part, "."))
+			{
+				builder.append(StringUtils.left(subpart, 3)).append("**").append(".");
+			}
+
+			builder.deleteCharAt(builder.length() - 1).append("@");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		String masked = builder.toString();
+		masked = masked.substring(0, masked.length() - 2);
+		System.out.println(masked);
+	}
 
 
 }

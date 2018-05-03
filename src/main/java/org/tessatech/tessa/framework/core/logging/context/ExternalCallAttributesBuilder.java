@@ -20,31 +20,41 @@ import org.springframework.http.HttpStatus;
 
 public class ExternalCallAttributesBuilder
 {
+	private String systemName;
 	private String serviceName;
 	private String serviceVersion;
 	private String serviceMethod;
-	private int httpStatusCode;
+	private String serviceOperation;
+	private Integer httpStatusCode;
 	private String externalResponseCode;
 	private String externalResponseMessage;
 	private String externalTraceId;
 	private long startTime;
+	private Throwable throwable;
 
-	public ExternalCallAttributesBuilder(String serviceMethod, String serviceName, String serviceVersion)
+	public ExternalCallAttributesBuilder(String systemName, String serviceName, String serviceMethod, String serviceOperation, String serviceVersion)
 	{
 		startTime = System.currentTimeMillis();
+		this.systemName = systemName;
 		this.serviceMethod = serviceMethod;
 		this.serviceName = serviceName;
 		this.serviceVersion = serviceVersion;
+		this.serviceOperation = serviceOperation;
 	}
 
-	public ExternalCallAttributesBuilder(String serviceMethod, String serviceName)
+	public ExternalCallAttributesBuilder(String systemName, String serviceName, String serviceMethod, String serviceOperation)
 	{
-		this(serviceMethod, serviceName, null);
+		this(systemName, serviceName, serviceMethod, serviceOperation, null);
 	}
 
-	public ExternalCallAttributesBuilder(String serviceMethod)
+	public ExternalCallAttributesBuilder(String systemName, String serviceMethod, String serviceOperation)
 	{
-		this(serviceMethod, null, null);
+		this(systemName, null, serviceMethod, serviceOperation, null);
+	}
+
+	public ExternalCallAttributesBuilder(String systemName, String serviceMethod)
+	{
+		this(systemName, null, serviceMethod,null, null);
 	}
 
 	public ExternalCallAttributesBuilder setHttpStatusCode(HttpStatus httpStatusCode)
@@ -59,7 +69,9 @@ public class ExternalCallAttributesBuilder
 
 	public ExternalCallAttributesBuilder setHttpStatusCode(int httpStatusCode)
 	{
-		this.httpStatusCode = httpStatusCode;
+		if(httpStatusCode != 0)
+			this.httpStatusCode = httpStatusCode;
+
 		return this;
 	}
 
@@ -93,16 +105,16 @@ public class ExternalCallAttributesBuilder
 		return this;
 	}
 
-	public ExternalCallAttributesBuilder setStartTime(long startTime)
+	public ExternalCallAttributesBuilder setThrowable(Throwable throwable)
 	{
-		this.startTime = startTime;
+		this.throwable = throwable;
 		return this;
 	}
 
 	private ExternalCallAttributes build(boolean wasSuccessful)
 	{
 		long endTime = System.currentTimeMillis();
-		return new ExternalCallAttributes(serviceName, serviceVersion, serviceMethod, wasSuccessful, httpStatusCode, externalResponseCode, externalResponseMessage, externalTraceId, startTime, endTime, (endTime - startTime));
+		return new ExternalCallAttributes(systemName, serviceName, serviceOperation, serviceVersion, serviceMethod, wasSuccessful, httpStatusCode, externalResponseCode, externalResponseMessage, externalTraceId, startTime, endTime, (endTime - startTime), throwable);
 	}
 
 	public void buildAndCommit(boolean success)
