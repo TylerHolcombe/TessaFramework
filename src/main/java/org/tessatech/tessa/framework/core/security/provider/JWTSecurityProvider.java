@@ -28,11 +28,7 @@ import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
-import org.tessatech.tessa.framework.core.exception.system.InternalException;
-import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
 import org.tessatech.tessa.framework.core.security.context.SecurityContext;
-import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
-import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtils;
 
