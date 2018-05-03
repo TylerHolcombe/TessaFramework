@@ -48,7 +48,7 @@ public class LoggingContext
 
 	public void addFieldMasked(String key, String value)
 	{
-		keyValueFields.put(key, "****" + StringUtils.right(value, 4));
+		keyValueFields.put(key, StringUtils.left(value, 4) + "****");
 	}
 
 	public void addFieldHashed(String key, String value)
