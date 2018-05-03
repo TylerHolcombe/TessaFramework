@@ -19,14 +19,20 @@ package org.tessatech.tessa.framework.core.security.provider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.rules.Verifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
+import org.tessatech.tessa.framework.core.security.client.container.Secret;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.core.security.context.SecurityContext;
 import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
@@ -41,16 +47,17 @@ public class JWTSecurityProvider implements SecurityProvider
 
 	public static final String JWT_TOKEN_HEADER_NAME = "Jwt-Token";
 
-	@Value("${jwt.issuer}")
+	@Value("${security.jwt.issuer}")
 	private String jwtIssuer = null;
 
-	@Value("${jwt.secret}")
-	private String jwtSecret = null;
-
-	@Value("${jwt.leeway:0}")
+	@Value("${security.jwt.leeway:0}")
 	private long jwtLeeway = 0;
 
-	private Algorithm algorithmHS;
+	private Algorithm currentAlgorithm;
+	private JWTVerifier currentVerifier;
+
+	private Algorithm previousAlgorithm;
+	private JWTVerifier previousVerifier;
 
 	@Override
 	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity) throws InvalidAuthenticationException
@@ -59,7 +66,7 @@ public class JWTSecurityProvider implements SecurityProvider
 
 		if(isTokenPresent(token))
 		{
-			getVerifier().verify(token);
+			verifyToken(token);
 
 			DecodedJWT decodedToken = JWT.decode(token);
 			String jwtId = decodedToken.getId();
@@ -69,7 +76,7 @@ public class JWTSecurityProvider implements SecurityProvider
 			String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
 
 
-			SecurityContext context = new SecurityContext("jwtToken", jwtId, userId, userName, userRoles);
+			SecurityContext context = new SecurityContext("JWT-Token", jwtId, userId, userName, userRoles);
 			SecurityContextHolder.setContext(context);
 		}
 
@@ -79,43 +86,68 @@ public class JWTSecurityProvider implements SecurityProvider
 		}
 	}
 
+	private void verifyToken(String token)
+	{
+		try
+		{
+			currentVerifier.verify(token);
+		}
+		catch (JWTVerificationException currentVerifierException)
+		{
+			//Perhaps the token is old, try again with previous verifier.
+
+			try
+			{
+				previousVerifier.verify(token);
+			}
+			catch (JWTVerificationException previousVerifierException)
+			{
+				throw new InvalidAuthenticationException("Could not verify JWT token", currentVerifierException);
+			}
+		}
+	}
+
 	private boolean isTheOnlyRoleTheDefault(String[] validRoles)
 	{
 		return validRoles.length == 1 && validRoles[0] == SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
 	}
-
 
 	private boolean isTokenPresent(String token)
 	{
 		return token != null && !token.trim().isEmpty();
 	}
 
-	private Algorithm getAlgorithm()
+	private Algorithm getAlgorithm(String secret)
 	{
-		if (algorithmHS == null)
-		{
-			InternalValidationUtils.getInstance().isNotTrimmedEmpty("jwtSecret", jwtSecret);
+		InternalValidationUtils.getInstance().isNotTrimmedEmpty("secret", secret);
 
-			try
-			{
-				algorithmHS = Algorithm.HMAC256(jwtSecret);
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				throw new InternalException("Could not load JWT HMAC-SHA256 Algorithm", e);
-			}
+		try
+		{
+			return Algorithm.HMAC256(secret);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new InternalException("Could not load JWT HMAC-SHA256 Algorithm", e);
 		}
 
-		return algorithmHS;
 	}
 
-	private JWTVerifier getVerifier()
+	private JWTVerifier getVerifier(Algorithm algorithm)
 	{
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("jwtIssuer", jwtIssuer);
 
-		return JWT.require(getAlgorithm())
+		return JWT.require(algorithm)
 				.withIssuer(jwtIssuer)
 				.acceptLeeway(jwtLeeway)
 				.build();
+	}
+
+	void updateSecret(Secret secret)
+	{
+		previousAlgorithm = getAlgorithm(secret.previousSecret);
+		previousVerifier = getVerifier(previousAlgorithm);
+
+		currentAlgorithm = getAlgorithm(secret.currentSecret);
+		currentVerifier = getVerifier(currentAlgorithm);
 	}
 }

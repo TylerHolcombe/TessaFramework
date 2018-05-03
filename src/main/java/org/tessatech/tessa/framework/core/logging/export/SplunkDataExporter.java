@@ -23,6 +23,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -57,6 +58,7 @@ public class SplunkDataExporter implements LogDataExporter
 	private RestTemplate restTemplate = buildRestTemplate();
 
 	@Override
+	@Async
 	public void exportLogMessage(String logMessage)
 	{
 		try
