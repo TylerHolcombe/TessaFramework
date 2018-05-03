@@ -26,7 +26,7 @@ import org.tessatech.tessa.framework.core.security.client.container.SecretReques
 @Component
 public class SecretRequestUtils
 {
-	@Value("${security.tessa.app.hmac.key}")
+	@Value("${security.tessa.iam.hmac.key}")
 	private String hmacKey;
 
 	public SecretRequest generateSecretRequest(String appName)

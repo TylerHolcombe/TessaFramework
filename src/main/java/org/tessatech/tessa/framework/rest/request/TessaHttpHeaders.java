@@ -17,6 +17,10 @@
 package org.tessatech.tessa.framework.rest.request;
 
 import org.springframework.http.HttpHeaders;
+import org.tessatech.tessa.framework.core.event.context.EventContext;
+import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
+
+import java.util.Optional;
 
 public class TessaHttpHeaders
 {
@@ -31,9 +35,26 @@ public class TessaHttpHeaders
 
 	private HttpHeaders headers;
 
+	public TessaHttpHeaders()
+	{
+		this.headers = new HttpHeaders();
+	}
+
 	public TessaHttpHeaders(HttpHeaders headers)
 	{
 		this.headers = headers;
+	}
+
+	public TessaHttpHeaders(Optional<EventContext> contextOptional)
+	{
+		this();
+
+		if (contextOptional.isPresent())
+		{
+			EventContext context = EventContextHolder.getContext();
+			setRequestId(String.valueOf(context.getInternalTraceId()));
+			setCorrelationId(String.valueOf(context.getInternalTraceId()));
+		}
 	}
 
 	public String getRequestId()

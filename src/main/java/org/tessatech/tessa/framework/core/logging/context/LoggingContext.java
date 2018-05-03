@@ -27,7 +27,7 @@ public class LoggingContext
 
 	private Map<String, Object> keyValueFields = new HashMap<>();
 	private Map<String, Long> runtimes = new HashMap<>();
-	private List<ExternalCallBuilder> externalLogAttributes = new ArrayList<>();
+	private List<ExternalCallAttributes> externalLogAttributes = new ArrayList<>();
 
 	private Throwable throwable;
 
@@ -84,7 +84,7 @@ public class LoggingContext
 		return runtimes.entrySet();
 	}
 
-	public void addExternalCall(ExternalCallBuilder attributes)
+	public void addExternalCall(ExternalCallAttributes attributes)
 	{
 		if (attributes != null)
 		{
@@ -92,7 +92,7 @@ public class LoggingContext
 		}
 	}
 
-	public List<ExternalCallBuilder> getExternalLogAttributes()
+	public List<ExternalCallAttributes> getExternalLogAttributes()
 	{
 		return externalLogAttributes;
 	}

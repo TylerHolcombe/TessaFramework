@@ -14,13 +14,21 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.logging;
+package org.tessatech.tessa.framework.core.event;
 
-import org.springframework.http.ResponseEntity;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface LogMessageBuilder
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TessaEvent
 {
-	public String buildTransactionLog(Object response);
+	String eventGroup() default "unknown";
+	String eventName() default "unknown";
+	String eventVersion() default "unknown";
 
-	public String buildEventLog(Object response);
+
+
 }

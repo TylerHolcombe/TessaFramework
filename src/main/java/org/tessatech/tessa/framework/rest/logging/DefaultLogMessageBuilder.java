@@ -23,13 +23,13 @@ import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.core.event.context.EventContext;
+import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
 import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
-import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.logging.LogMessageBuilder;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
@@ -47,10 +47,10 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class RestLogMessageBuilder implements LogMessageBuilder
+public class DefaultLogMessageBuilder implements LogMessageBuilder
 {
 
-	private static final Logger logger = LogManager.getLogger(RestLogMessageBuilder.class);
+	private static final Logger logger = LogManager.getLogger(DefaultLogMessageBuilder.class);
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -89,6 +89,34 @@ public class RestLogMessageBuilder implements LogMessageBuilder
 
 		return gson.toJson(object);
 	}
+
+	@Override
+	public String buildEventLog(Object response)
+	{
+		JsonObject object = new JsonObject();
+
+		if(EventContextHolder.getContextOptional().isPresent())
+		{
+			addEventContextFields(object, EventContextHolder.getContextOptional());
+		}
+
+		if (LoggingContextHolder.getContextOptional().isPresent())
+		{
+			addLoggingContextFields(LoggingContextHolder.getContextOptional(), object);
+		}
+
+		return gson.toJson(object);
+	}
+
+	private void addEventContextFields(JsonObject object, Optional<EventContext> eventContextOptional)
+	{
+		EventContext eventContext = eventContextOptional.get();
+		addIfNotNull(object, "eventName", eventContext.getEventName());
+		addIfNotNull(object, "eventVersion", eventContext.getEventVersion());
+		addIfNotNull(object, "eventGroup", eventContext.getEventGroup());
+		addIfNotNull(object, "internalTraceId", eventContext.getInternalTraceId());
+	}
+
 
 	private ResponseEntity<?> convertResponseIntoResponseEntity(Object response)
 	{

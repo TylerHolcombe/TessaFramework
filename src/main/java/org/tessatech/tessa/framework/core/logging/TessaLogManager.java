@@ -39,8 +39,17 @@ public class TessaLogManager
 
 	public void logTransaction(Object response)
 	{
-		String logMessage = logMessageBuilder.buildTransactionLog(response);
+		writeLogMessage(logMessageBuilder.buildTransactionLog(response));
+	}
 
+	public void logEvent(Object response)
+	{
+		writeLogMessage(logMessageBuilder.buildEventLog(response));
+	}
+
+
+	private void writeLogMessage(String logMessage)
+	{
 		logger.info(logMessage);
 
 		if (exportEnabled)

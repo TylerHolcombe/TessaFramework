@@ -16,9 +16,73 @@
 
 package org.tessatech.tessa.framework.core.security.client;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.tessatech.tessa.framework.core.event.TessaEvent;
+import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
+import org.tessatech.tessa.framework.core.logging.context.ExternalCallAttributesBuilder;
+import org.tessatech.tessa.framework.core.security.client.container.Secret;
+import org.tessatech.tessa.framework.core.security.client.container.SecretRequest;
+import org.tessatech.tessa.framework.core.security.client.utils.SecretRequestUtils;
+import org.tessatech.tessa.framework.core.util.RestClientUtils;
+import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
+
+import java.net.URI;
+import java.util.Optional;
 
 @Component
 public class IAMServiceClient
 {
+	private static final Logger logger = LogManager.getLogger(IAMServiceClient.class);
+
+	@Autowired
+	private SecretRequestUtils secretRequestUtils;
+
+	@Value("${security.tessa.iam.app.name}")
+	private String appName;
+
+	@Value("${security.tessa.iam.endpoint.url}")
+	private String endpointUrl;
+
+	private  RestTemplate restTemplate = buildRestTemplate();
+
+	@TessaEvent(eventName = "retrieveLatestSecret", eventGroup = "iam")
+	public Optional<Secret> retrieveLatestSecret()
+	{
+		ExternalCallAttributesBuilder attributes = new ExternalCallAttributesBuilder("/secret", "iam" );
+		try
+		{
+			TessaHttpHeaders headers = new TessaHttpHeaders(EventContextHolder.getContextOptional());
+			SecretRequest request = secretRequestUtils.generateSecretRequest(appName);
+
+			RequestEntity<SecretRequest> requestEntity = new RequestEntity<>(request, headers.getHeaders(), HttpMethod.POST, URI.create(endpointUrl));
+
+			ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
+
+			return  RestClientUtils.parseAndProcessTessaRestResponse(response, attributes, Secret.class);
+		}
+		catch (Exception e)
+		{
+			logger.error("Error occurred retrieving secret from IAM Service.", e);
+			attributes.buildAndCommit(false);
+		}
+
+		return Optional.empty();
+	}
+
+	private RestTemplate buildRestTemplate()
+	{
+		return new RestTemplateBuilder()
+				.setConnectTimeout(15000)
+				.setReadTimeout(15000)
+				.build();
+	}
 }
