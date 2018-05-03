@@ -269,13 +269,13 @@ public class RequestValidationUtilsTest
 	@Test
 	public void isSanitizedRegex_True()
 	{
-		util.isSanitized("Test", "abcABC123", SanitizeRegex.ALPHA_NUMERIC_ONLY.getRegex());
+		util.isSanitized("Test", "abcABC123~`!@#$%^&*()-_=+|?,.", SanitizeRegex.NO_BRACES.getRegex());
 	}
 
 	@Test(expected = ValidationException.class)
 	public void isSanitizedRegex_False()
 	{
-		util.isSanitized("Test", "abcABC123}", SanitizeRegex.ALPHA_NUMERIC_ONLY.getRegex());
+		util.isSanitized("Test", "abcABC123}", SanitizeRegex.NO_BRACES.getRegex());
 	}
 
 

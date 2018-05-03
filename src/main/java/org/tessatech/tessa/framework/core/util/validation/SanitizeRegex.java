@@ -20,7 +20,8 @@ public enum SanitizeRegex
 {
 	ALPHA_ONLY("[A-Za-z]+"),
 	NUMERIC_ONLY("[0-9]+"),
-	ALPHA_NUMERIC_ONLY("[0-9A-Za-z]+");
+	ALPHA_NUMERIC_ONLY("[0-9A-Za-z]+"),
+	NO_BRACES("[0-9A-Za-z~`!@#$%^&*()-_=+|?,.]+");
 
 	private String regex;
 

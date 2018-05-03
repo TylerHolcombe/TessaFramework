@@ -28,7 +28,7 @@ public class ThrowableAdapterFinder
 
 	private static final Map<String, ThrowableAdapter> exceptionsToAdapters = new ConcurrentHashMap<>();
 
-	private static ThrowableAdapter fallbackThrowableAdapter = new FallbackThrowableAdapter();
+	private static ThrowableAdapter fallbackThrowableAdapter = null;
 
 	private ThrowableAdapterFinder()
 	{
@@ -88,6 +88,11 @@ public class ThrowableAdapterFinder
 			if(adapter == null)
 			{
 				adapter = fallbackThrowableAdapter;
+			}
+
+			if(adapter == null)
+			{
+				adapter = new FallbackThrowableAdapter();
 			}
 
 			// Register adapter so we do not need to look them up again

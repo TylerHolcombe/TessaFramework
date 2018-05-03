@@ -16,9 +16,11 @@
 
 package org.tessatech.tessa.framework.rest;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.logic.InvalidRequestException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.transaction.TessaTransaction;
@@ -63,7 +65,7 @@ public class RestServiceMapper
 
 	}
 
-	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(RestThrowableAdapter details, Throwable throwable)
+	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(ThrowableAdapter details, Throwable throwable)
 	{
 		long internalTraceId = 0;
 
@@ -72,12 +74,18 @@ public class RestServiceMapper
 			internalTraceId = TransactionContextHolder.getContextOptional().get().getInternalTraceId();
 		}
 
-		TessaError tessaError = new TessaError(String.valueOf(details.getHttpStatus()), details.getExceptionCode(throwable),
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+		if (details instanceof RestThrowableAdapter)
+		{
+			status = ((RestThrowableAdapter) details).getHttpStatus();
+		}
+
+		TessaError tessaError = new TessaError(String.valueOf(status.value()), details.getExceptionCode(throwable),
 				details.getExceptionMessage(throwable), internalTraceId);
 
 		TessaWebserviceResponse response = new DefaultTessaWebserviceResponse(tessaError);
 
 
-		return new ResponseEntity<TessaWebserviceResponse>(response, details.getHttpStatus());
+		return new ResponseEntity<TessaWebserviceResponse>(response, status);
 	}
 }
