@@ -47,7 +47,6 @@ public class TessaLogManager
 		writeLogMessage(logMessageBuilder.buildEventLog(response));
 	}
 
-
 	private void writeLogMessage(String logMessage)
 	{
 		logger.info(logMessage);
@@ -57,4 +56,5 @@ public class TessaLogManager
 			logDataExporter.exportLogMessage(logMessage);
 		}
 	}
+
 }

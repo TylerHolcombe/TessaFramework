@@ -16,8 +16,6 @@
 
 package org.tessatech.tessa.framework.core.logging;
 
-import org.springframework.http.ResponseEntity;
-
 public interface LogMessageBuilder
 {
 	public String buildTransactionLog(Object response);
