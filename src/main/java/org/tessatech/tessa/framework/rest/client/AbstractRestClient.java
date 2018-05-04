@@ -35,7 +35,7 @@ import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
 
 import java.net.URI;
 
-public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorResponse>
+public abstract class AbstractRestClient<ErrorResponse>
 {
 	private static final Logger logger = LogManager.getLogger(IAMServiceClient.class);
 	private static final Gson gson = new Gson();
@@ -44,26 +44,25 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 	private String serviceName;
 	private String serviceVersion;
 
-	private Class<SuccessfulResponse> successClass;
 	private Class<ErrorResponse> errorClass;
 
 	private RestTemplate restTemplate = buildRestTemplate();
 
 	public AbstractRestClient(String systemName, String serviceName, String serviceVersion,
-			Class<SuccessfulResponse> successClass, Class<ErrorResponse> errorClass)
+			Class<ErrorResponse> errorClass)
 	{
 		this.systemName = systemName;
 		this.serviceName = serviceName;
 		this.serviceVersion = serviceVersion;
-		this.successClass = successClass;
 		this.errorClass = errorClass;
 	}
 
 
-	protected SuccessfulResponse execute(String methodName, Request request, String uri, HttpMethod method)
+	protected <Request, SuccessfulResponse> SuccessfulResponse execute(String methodName, Request request, String uri,
+			HttpMethod method, Class<SuccessfulResponse> successfulResponseClass)
 	{
 		Either<ErrorResponse, SuccessfulResponse> response =
-				execute(methodName, request, buildHttpHeaders(), uri, method, true);
+				execute(methodName, request, buildHttpHeaders(), uri, method, true, successfulResponseClass);
 
 
 		if (response.isLeft())
@@ -74,10 +73,11 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 		return response.right().get();
 	}
 
-	protected Either<ErrorResponse, SuccessfulResponse> execute(String methodName, Request request, String uri,
-			HttpMethod method, boolean throwErrors)
+	protected <Request, SuccessfulResponse> Either<ErrorResponse, SuccessfulResponse> execute(String methodName,
+			Request request, String uri, HttpMethod method, boolean throwErrors,
+			Class<SuccessfulResponse> successfulResponseClass)
 	{
-		return execute(methodName, request, buildHttpHeaders(), uri, method, throwErrors);
+		return execute(methodName, request, buildHttpHeaders(), uri, method, throwErrors, successfulResponseClass);
 	}
 
 
@@ -97,12 +97,11 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 
 	protected abstract ExternalException convertErrorIntoException(ErrorResponse errorResponse);
 
-	protected abstract void addSuccessAttributes(ExternalCallAttributesBuilder builder, SuccessfulResponse response);
-
 	protected abstract void addErrorAttributes(ExternalCallAttributesBuilder builder, ErrorResponse response);
 
-	private Either<ErrorResponse, SuccessfulResponse> execute(String serviceMethodName, Request request,
-			HttpHeaders headers, String uri, HttpMethod method, boolean throwErrors)
+	private <Request, SuccessfulResponse> Either<ErrorResponse, SuccessfulResponse> execute(String serviceMethodName,
+			Request request, HttpHeaders headers, String uri, HttpMethod method, boolean throwErrors,
+			Class<SuccessfulResponse> successfulResponseClass)
 	{
 		ExternalCallAttributesBuilder builder =
 				new ExternalCallAttributesBuilder(systemName, serviceName, serviceMethodName, method.name(),
@@ -111,7 +110,7 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 		Either<ErrorResponse, SuccessfulResponse> responseEither = null;
 		try
 		{
-			responseEither = performCall(request, headers, uri, method, builder, responseEither);
+			responseEither = performCall(request, headers, uri, method, builder, successfulResponseClass);
 
 			if (isResponseAnError(responseEither))
 			{
@@ -122,7 +121,6 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 			}
 			else
 			{
-				addSuccessAttributes(builder, responseEither.right().get());
 				builder.setSuccess(true);
 			}
 		}
@@ -147,9 +145,9 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 		return responseEither;
 	}
 
-	private Either<ErrorResponse, SuccessfulResponse> performCall(Request request, HttpHeaders headers, String uri,
-			HttpMethod method, ExternalCallAttributesBuilder builder,
-			Either<ErrorResponse, SuccessfulResponse> responseEither)
+	private <Request, SuccessfulResponse> Either<ErrorResponse, SuccessfulResponse> performCall(Request request,
+			HttpHeaders headers, String uri, HttpMethod method, ExternalCallAttributesBuilder builder,
+			Class<SuccessfulResponse> successfulResponseClass)
 	{
 		RequestEntity<Request> requestEntity = new RequestEntity<>(request, headers, method, URI.create(uri));
 
@@ -158,17 +156,16 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 
 		builder.setHttpStatusCode(responseEntity.getStatusCode().value());
 
-		responseEither = buildEitherFromResponse(responseEntity);
-		return responseEither;
+		return buildEitherFromResponse(responseEntity, successfulResponseClass);
 	}
 
-	private boolean isResponseAnError(Either<ErrorResponse, SuccessfulResponse> responseEither)
+	private boolean isResponseAnError(Either<ErrorResponse, ?> responseEither)
 	{
 		return responseEither.isLeft();
 	}
 
 	private void handleError(boolean throwErrors, ExternalCallAttributesBuilder builder,
-			Either<ErrorResponse, SuccessfulResponse> responseEither)
+			Either<ErrorResponse, ?> responseEither)
 	{
 		if (throwErrors)
 		{
@@ -196,10 +193,9 @@ public abstract class AbstractRestClient<Request, SuccessfulResponse, ErrorRespo
 		throw httpStatusCodeException;
 	}
 
-	private Either<ErrorResponse, SuccessfulResponse> buildEitherFromResponse(ResponseEntity<String> responseEntity)
+	private <SuccessfulResponse> Either<ErrorResponse, SuccessfulResponse> buildEitherFromResponse(
+			ResponseEntity<String> responseEntity, Class<SuccessfulResponse> successClass)
 	{
-		Either<ErrorResponse, SuccessfulResponse> eitherErrorOrSecret;
-
 		if (!responseEntity.getStatusCode().is1xxInformational() && !responseEntity.getStatusCode().is2xxSuccessful())
 		{
 			return Either.left(gson.fromJson(responseEntity.getBody(), errorClass));

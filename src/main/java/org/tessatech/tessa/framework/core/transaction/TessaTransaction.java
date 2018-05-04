@@ -27,10 +27,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TessaTransaction
 {
-	String serviceName() default "unknown";
-	String serviceOperation() default "*";
-	String serviceVersion() default "unknown";
-	String serviceMethodName() default "unknown";
+	String serviceName();
+	String serviceOperation() default "";
+	String serviceVersion() default "";
+	String serviceMethodName();
 
 	String[] authorizedRoles() default SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
 }

@@ -16,9 +16,22 @@
 
 package org.tessatech.tessa.framework.rest.response;
 
-public interface TessaWebserviceResponse
+public class TessaErrorResponse
 {
-	public TessaError getError();
+	TessaError error;
 
+	public TessaErrorResponse()
+	{
 
+	}
+
+	public TessaErrorResponse(TessaError error)
+	{
+		this.error = error;
+	}
+
+	public TessaError getError()
+	{
+		return error;
+	}
 }

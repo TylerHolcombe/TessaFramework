@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.event.TessaEvent;
 import org.tessatech.tessa.framework.core.security.client.container.Secret;
-import org.tessatech.tessa.framework.core.security.client.container.SecretRequest;
 import org.tessatech.tessa.framework.core.security.client.utils.SecretRequestUtils;
 import org.tessatech.tessa.framework.rest.client.TessaRestClient;
 
@@ -43,14 +42,15 @@ public class IAMServiceClient
 	@Value("${security.tessa.iam.endpoint.url}")
 	private String endpointUrl;
 
-	private TessaRestClient<SecretRequest, Secret> client = new TessaRestClient<>("IAM Service", Secret.class);
+	private TessaRestClient client = new TessaRestClient("IAM Service");
 
 	@TessaEvent(eventName = "retrieveLatestSecret", eventGroup = "iam")
 	public Optional<Secret> retrieveLatestSecret()
 	{
 		try
 		{
-			return Optional.of(client.post("/secret", endpointUrl, secretRequestUtils.generateSecretRequest(appName)));
+			return Optional.of(client
+					.post("/secret", endpointUrl, secretRequestUtils.generateSecretRequest(appName), Secret.class));
 		}
 		catch (Exception e)
 		{

@@ -36,10 +36,8 @@ import org.tessatech.tessa.framework.core.security.SecurityManager;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.rest.RestServiceMapper;
 import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
-import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
-
-import javax.servlet.http.HttpServletRequest;
+import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
 
 @Aspect
@@ -115,7 +113,7 @@ public class TessaTransactionAspect
 		SecurityContextHolder.clearContext();
 	}
 
-	public ResponseEntity<TessaWebserviceResponse> handleError(Throwable throwable)
+	public ResponseEntity<TessaErrorResponse> handleError(Throwable throwable)
 	{
 		ThrowableAdapter throwableAdapter = throwableAdapterFinderWrapper.getThrowableAdapter(throwable);
 		LoggingContextHolder.getContextOptional().ifPresent(context -> context.addThrowable(throwable));

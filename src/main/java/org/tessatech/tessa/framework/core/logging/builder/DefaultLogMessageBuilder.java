@@ -40,7 +40,7 @@ import org.tessatech.tessa.framework.core.transaction.context.TransactionContext
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 import org.tessatech.tessa.framework.rest.response.TessaError;
-import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
+import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -196,12 +196,12 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 		long endTime = System.currentTimeMillis();
 
-		JsonObject timing = new JsonObject();
-		addIfNotNull(timing, "startTime", loggingContext.getStartTime());
-		addIfNotNull(timing, "endTime", endTime);
-		addIfNotNull(timing, "runtime", (endTime - loggingContext.getStartTime()));
-		timing.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
-		logMessage.add("timing", timing);
+		JsonObject timings = new JsonObject();
+		addIfNotNull(timings, "startTime", loggingContext.getStartTime());
+		addIfNotNull(timings, "endTime", endTime);
+		addIfNotNull(timings, "runtime", (endTime - loggingContext.getStartTime()));
+		timings.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
+		logMessage.add("timings", timings);
 
 
 		logMessage.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
@@ -237,12 +237,12 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 	private boolean doesResponseContainAnError(ResponseEntity<?> response)
 	{
 		return response != null && response.getBody() != null &&
-				response.getBody() instanceof TessaWebserviceResponse && ((TessaWebserviceResponse) response.getBody()).getError() != null;
+				response.getBody() instanceof TessaErrorResponse && ((TessaErrorResponse) response.getBody()).getError() != null;
 	}
 
 	private void addIfNotNull(JsonObject object, String key, String value)
 	{
-		if (key != null && value != null)
+		if (key != null && value != null && !value.isEmpty())
 		{
 			object.addProperty(key, value);
 		}
@@ -328,13 +328,19 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		addIfNotNull(externalCall, "serviceOperation", attributes.serviceOperation);
 		addIfNotNull(externalCall, "serviceVersion", attributes.serviceVersion);
 		addIfNotNull(externalCall, "success", attributes.success);
-		addIfNotNull(externalCall, "httpStatusCode", attributes.httpStatusCode);
-		addIfNotNull(externalCall, "externalResponseCode", attributes.externalResponseCode);
-		addIfNotNull(externalCall, "externalResponseMessage", attributes.externalResponseMessage);
-		addIfNotNull(externalCall, "externalTraceId", attributes.externalTraceId);
-		addIfNotNull(externalCall, "startTime", attributes.startTime);
-		addIfNotNull(externalCall, "endTime", attributes.endTime);
-		addIfNotNull(externalCall, "runtime", attributes.runtime);
+
+		JsonObject timings = new JsonObject();
+		addIfNotNull(timings, "startTime", attributes.startTime);
+		addIfNotNull(timings, "endTime", attributes.endTime);
+		addIfNotNull(timings, "runtime", attributes.runtime);
+		externalCall.add("externalTimings", timings);
+
+		JsonObject response = new JsonObject();
+		addIfNotNull(response, "httpStatusCode", attributes.httpStatusCode);
+		addIfNotNull(response, "externalResponseCode", attributes.externalResponseCode);
+		addIfNotNull(response, "externalResponseMessage", attributes.externalResponseMessage);
+		addIfNotNull(response, "externalTraceId", attributes.externalTraceId);
+		externalCall.add("externalResponse", response);
 
 		if(attributes.throwable != null)
 		{
@@ -367,9 +373,9 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 	private void addResponseFields(Object response, JsonObject logMessage)
 	{
 		JsonObject jsonResponse = new JsonObject();
-		if (response instanceof TessaWebserviceResponse)
+		if (response instanceof TessaErrorResponse)
 		{
-			TessaError tessaTessaError = ((TessaWebserviceResponse) response).getError();
+			TessaError tessaTessaError = ((TessaErrorResponse) response).getError();
 			addIfNotNull(logMessage, "httpStatusCode", tessaTessaError.httpStatus);
 			addIfNotNull(logMessage, "exceptionCode", tessaTessaError.errorCode);
 			addIfNotNull(logMessage, "exceptionMessage", tessaTessaError.errorMessage);

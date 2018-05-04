@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.util;
+package org.tessatech.tessa.framework.rest.util;
 
 import com.google.gson.Gson;
 import io.atlassian.fugue.Either;
@@ -29,7 +29,7 @@ import org.tessatech.tessa.framework.core.transaction.context.TransactionContext
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 import org.tessatech.tessa.framework.rest.response.TessaError;
-import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
+import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
 import java.util.Optional;
 
@@ -89,11 +89,11 @@ public class RestClientUtils
 	}
 
 
-	private static <T> Either<TessaWebserviceResponse, T> parseTessaRestResponse(ResponseEntity<String> response, Class<T> successClass)
+	private static <T> Either<TessaErrorResponse, T> parseTessaRestResponse(ResponseEntity<String> response, Class<T> successClass)
 	{
 		if (!response.getStatusCode().is1xxInformational() && !response.getStatusCode().is2xxSuccessful())
 		{
-			return Either.left(gson.fromJson(response.getBody(), TessaWebserviceResponse.class));
+			return Either.left(gson.fromJson(response.getBody(), TessaErrorResponse.class));
 		}
 
 		return Either.right(gson.fromJson(response.getBody(), successClass));
@@ -104,7 +104,7 @@ public class RestClientUtils
 	{
 		attributes.setHttpStatusCode(response.getStatusCode().value());
 
-		Either<TessaWebserviceResponse, T> eitherErrorOrSecret = parseTessaRestResponse(response, successClass);
+		Either<TessaErrorResponse, T> eitherErrorOrSecret = parseTessaRestResponse(response, successClass);
 
 		if (eitherErrorOrSecret.isLeft())
 		{

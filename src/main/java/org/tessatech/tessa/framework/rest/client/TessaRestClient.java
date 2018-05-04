@@ -22,51 +22,55 @@ import org.springframework.http.HttpMethod;
 import org.tessatech.tessa.framework.core.exception.system.ExternalException;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
-import org.tessatech.tessa.framework.core.util.RestClientUtils;
+import org.tessatech.tessa.framework.rest.util.RestClientUtils;
 import org.tessatech.tessa.framework.rest.response.TessaError;
-import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
+import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
-public class TessaRestClient<Request, SuccessfulResponse>
-		extends AbstractRestClient<Request, SuccessfulResponse, TessaWebserviceResponse>
+public class TessaRestClient extends AbstractRestClient<TessaErrorResponse>
 {
-	public TessaRestClient(String serviceName, Class<SuccessfulResponse> successClass)
+	public TessaRestClient(String serviceName)
 	{
-		this("Tessa", serviceName, successClass);
+		this(null, serviceName);
 	}
 
-	public TessaRestClient(String systemName, String serviceName, Class<SuccessfulResponse> successClass)
+	public TessaRestClient(String systemName, String serviceName)
 	{
-		this(systemName, serviceName, null, successClass);
+		this(systemName, serviceName, null);
 	}
 
-	public TessaRestClient(String systemName, String serviceName, String serviceVersion, Class<SuccessfulResponse> successClass)
+	public TessaRestClient(String systemName, String serviceName, String serviceVersion)
 	{
-		super(systemName, serviceName, serviceVersion, successClass, TessaWebserviceResponse.class);
+		super(systemName, serviceName, serviceVersion, TessaErrorResponse.class);
 	}
 
-	public SuccessfulResponse post(String methodName, String uri, Request request)
+	public <Request, SuccessfulResponse> SuccessfulResponse post(String methodName, String url, Request request,
+			Class<SuccessfulResponse> responseClass)
 	{
-		return super.execute(methodName, request, uri, HttpMethod.POST);
+		return super.execute(methodName, request, url, HttpMethod.POST, responseClass);
 	}
 
-	public SuccessfulResponse get(String methodName, String uri, Request request)
+	public <Request, SuccessfulResponse> SuccessfulResponse get(String methodName, String url, Request request,
+			Class<SuccessfulResponse> responseClass)
 	{
-		return super.execute(methodName, null, uri, HttpMethod.GET);
+		return super.execute(methodName, null, url, HttpMethod.GET, responseClass);
 	}
 
-	public SuccessfulResponse put(String methodName, String uri, Request request)
+	public <Request, SuccessfulResponse> SuccessfulResponse put(String methodName, String url, Request request,
+			Class<SuccessfulResponse> responseClass)
 	{
-		return super.execute(methodName, request, uri, HttpMethod.PUT);
+		return super.execute(methodName, request, url, HttpMethod.PUT, responseClass);
 	}
 
-	public SuccessfulResponse patch(String methodName, String uri, Request request)
+	public <Request, SuccessfulResponse> SuccessfulResponse patch(String methodName, String url, Request request,
+			Class<SuccessfulResponse> responseClass)
 	{
-		return super.execute(methodName, request, uri, HttpMethod.POST);
+		return super.execute(methodName, request, url, HttpMethod.POST, responseClass);
 	}
 
-	public SuccessfulResponse delete(String methodName, String uri, Request request)
+	public <Request, SuccessfulResponse> SuccessfulResponse delete(String methodName, String url, Request request,
+			Class<SuccessfulResponse> responseClass)
 	{
-		return super.execute(methodName, request, uri, HttpMethod.DELETE);
+		return super.execute(methodName, request, url, HttpMethod.DELETE, responseClass);
 	}
 
 	@Override
@@ -81,24 +85,18 @@ public class TessaRestClient<Request, SuccessfulResponse>
 	}
 
 	@Override
-	protected ExternalException convertErrorIntoException(TessaWebserviceResponse tessaWebserviceResponse)
+	protected ExternalException convertErrorIntoException(TessaErrorResponse tessaErrorResponse)
 	{
-		TessaError error = tessaWebserviceResponse.getError();
+		TessaError error = tessaErrorResponse.getError();
 
 		return new ExternalException(String.valueOf(error.errorCode), error.errorMessage);
 	}
 
 	@Override
-	protected void addSuccessAttributes(ExternalCallAttributesBuilder builder, SuccessfulResponse response)
-	{
-		return;
-	}
-
-	@Override
 	protected void addErrorAttributes(ExternalCallAttributesBuilder builder,
-			TessaWebserviceResponse tessaWebserviceResponse)
+			TessaErrorResponse tessaErrorResponse)
 	{
-		TessaError error = tessaWebserviceResponse.getError();
+		TessaError error = tessaErrorResponse.getError();
 		builder.setExternalResponseCode(error.errorCode);
 		builder.setExternalResponseMessage(error.errorMessage);
 		builder.setExternalTraceId(error.internalErrorId);

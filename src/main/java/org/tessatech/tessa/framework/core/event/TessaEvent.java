@@ -25,9 +25,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TessaEvent
 {
-	String eventGroup() default "unknown";
-	String eventName() default "unknown";
-	String eventVersion() default "unknown";
+	String eventGroup() default "";
+	String eventName();
+	String eventVersion() default "";
 
 
 

@@ -30,9 +30,8 @@ import org.tessatech.tessa.framework.core.transaction.context.TransactionContext
 import org.tessatech.tessa.framework.core.util.UniqueIdentifierUtils;
 import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
-import org.tessatech.tessa.framework.rest.response.DefaultTessaWebserviceResponse;
 import org.tessatech.tessa.framework.rest.response.TessaError;
-import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
+import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -71,7 +70,7 @@ public class RestServiceMapper
 
 	}
 
-	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(ThrowableAdapter details,
+	public ResponseEntity<TessaErrorResponse> mapTessaExceptionResponse(ThrowableAdapter details,
 			Throwable throwable)
 	{
 		long internalTraceId = 0;
@@ -90,10 +89,10 @@ public class RestServiceMapper
 		TessaError tessaError = new TessaError(String.valueOf(status.value()), details.getExceptionCode(throwable),
 				details.getExceptionMessage(throwable), internalTraceId);
 
-		TessaWebserviceResponse response = new DefaultTessaWebserviceResponse(tessaError);
+		TessaErrorResponse response = new TessaErrorResponse(tessaError);
 
 
-		return new ResponseEntity<TessaWebserviceResponse>(response, status);
+		return new ResponseEntity<TessaErrorResponse>(response, status);
 	}
 
 	private String getClientIp(TessaHttpHeaders headers)

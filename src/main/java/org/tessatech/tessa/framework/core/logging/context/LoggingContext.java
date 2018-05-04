@@ -114,4 +114,16 @@ public class LoggingContext
 	{
 		return throwable;
 	}
+
+	public long getTotalExternalCallRuntime()
+	{
+		long externalRuntime = 0;
+
+		for(ExternalCallAttributes attributes : externalLogAttributes)
+		{
+			externalRuntime += attributes.runtime;
+		}
+
+		return externalRuntime;
+	}
 }
