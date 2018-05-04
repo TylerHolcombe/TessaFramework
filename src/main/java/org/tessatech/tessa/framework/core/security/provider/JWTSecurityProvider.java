@@ -21,31 +21,31 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.rules.Verifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.RequestEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
-import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
 import org.tessatech.tessa.framework.core.security.client.container.Secret;
-import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
+import org.tessatech.tessa.framework.core.security.context.AuthenticationType;
 import org.tessatech.tessa.framework.core.security.context.SecurityContext;
+import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtils;
+import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 
 @Component
 public class JWTSecurityProvider implements SecurityProvider
 {
 	private static final Logger logger = LogManager.getLogger(JWTSecurityProvider.class);
 
-	public static final String JWT_TOKEN_HEADER_NAME = "Jwt-Token";
+	private static final String authenticationScheme = "Bearer";
 
 	@Value("${security.jwt.issuer}")
 	private String jwtIssuer = null;
@@ -60,15 +60,16 @@ public class JWTSecurityProvider implements SecurityProvider
 	private JWTVerifier previousVerifier;
 
 	@Override
-	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity) throws InvalidAuthenticationException
+	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity)
+			throws InvalidAuthenticationException
 	{
-		String token  = requestEntity.getHeaders().getFirst(JWT_TOKEN_HEADER_NAME);
+		Optional<String> tokenOptional = retrieveAndValidateToken(requestEntity);
 
-		if(isTokenPresent(token))
+		if (tokenOptional.isPresent())
 		{
-			verifyToken(token);
+			verifyToken(tokenOptional.get());
 
-			DecodedJWT decodedToken = JWT.decode(token);
+			DecodedJWT decodedToken = JWT.decode(tokenOptional.get());
 			String jwtId = decodedToken.getId();
 
 			String userId = decodedToken.getClaim("userId").asString();
@@ -76,14 +77,52 @@ public class JWTSecurityProvider implements SecurityProvider
 			String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
 
 
-			SecurityContext context = new SecurityContext("JWT-Token", jwtId, userId, userName, userRoles);
+			SecurityContext context =
+					new SecurityContext(AuthenticationType.JWT, jwtId, authenticationScheme, tokenOptional.get(),
+							userId, userName, userRoles);
 			SecurityContextHolder.setContext(context);
 		}
 
-		if(SecurityUtils.containsNonDefaultRoles(validRoles))
+		if (SecurityUtils.containsNonDefaultRoles(validRoles))
 		{
 			SecurityUtils.validateUserHasAnyRole(validRoles);
 		}
+	}
+
+	private Optional<String> retrieveAndValidateToken(RequestEntity requestEntity)
+	{
+		if (requestEntity == null || requestEntity.getHeaders() == null)
+		{
+			return Optional.empty();
+		}
+
+		TessaHttpHeaders headers = new TessaHttpHeaders(requestEntity.getHeaders());
+
+		String auth = headers.getAuthorization();
+		if (auth == null)
+		{
+			return Optional.empty();
+		}
+
+		String[] authSplit = auth.split(" ");
+
+		if (authSplit.length != 2)
+		{
+			return Optional.empty();
+		}
+
+		String scheme = authSplit[0];
+		String token = authSplit[1];
+
+		if (authenticationScheme.equalsIgnoreCase(scheme))
+		{
+			if (StringUtils.isNotBlank(token))
+			{
+				return Optional.of(token);
+			}
+		}
+
+		return Optional.empty();
 	}
 
 	private void verifyToken(String token)
@@ -112,11 +151,6 @@ public class JWTSecurityProvider implements SecurityProvider
 		return validRoles.length == 1 && validRoles[0] == SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
 	}
 
-	private boolean isTokenPresent(String token)
-	{
-		return token != null && !token.trim().isEmpty();
-	}
-
 	private Algorithm getAlgorithm(String secret)
 	{
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("secret", secret);
@@ -136,10 +170,7 @@ public class JWTSecurityProvider implements SecurityProvider
 	{
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("jwtIssuer", jwtIssuer);
 
-		return JWT.require(algorithm)
-				.withIssuer(jwtIssuer)
-				.acceptLeeway(jwtLeeway)
-				.build();
+		return JWT.require(algorithm).withIssuer(jwtIssuer).acceptLeeway(jwtLeeway).build();
 	}
 
 	void updateSecret(Secret secret)

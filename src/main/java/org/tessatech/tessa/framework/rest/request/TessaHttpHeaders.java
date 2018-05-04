@@ -24,6 +24,8 @@ import java.util.Optional;
 
 public class TessaHttpHeaders
 {
+	private static final String AUTHORIZATION = "Authorization";
+
 	private static final String REQUEST_ID = "X-Request-ID";
 	private static final String CORRELATION_ID = "X-Correlation-ID";
 	private static final String SESSION_ID = "X-Session-ID";
@@ -47,16 +49,14 @@ public class TessaHttpHeaders
 		this.headers = headers;
 	}
 
-	public TessaHttpHeaders(Optional<EventContext> contextOptional)
+	public String getAuthorization()
 	{
-		this();
+		return headers.getFirst(AUTHORIZATION);
+	}
 
-		if (contextOptional.isPresent())
-		{
-			EventContext context = EventContextHolder.getContext();
-			setRequestId(String.valueOf(context.getInternalTraceId()));
-			setCorrelationId(String.valueOf(context.getInternalTraceId()));
-		}
+	public void setAuthorization(String value)
+	{
+		headers.add(AUTHORIZATION, value);
 	}
 
 	public String getRequestId()

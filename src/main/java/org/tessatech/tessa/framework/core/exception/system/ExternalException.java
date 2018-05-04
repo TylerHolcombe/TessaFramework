@@ -38,9 +38,9 @@ public class ExternalException extends RuntimeException
 		this(externalExceptionCode, null, debugMessage, cause);
 	}
 
-	public ExternalException(String externalExceptionCode, String debugMessage)
+	public ExternalException(String externalExceptionCode, String externalExceptionMessage)
 	{
-		this(externalExceptionCode, null, debugMessage, null);
+		this(externalExceptionCode, externalExceptionMessage, externalExceptionMessage, null);
 	}
 
 	public ExternalException(String debugMessage, Throwable cause)

@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.rest.logging;
+package org.tessatech.tessa.framework.core.logging.builder;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,8 +30,7 @@ import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
 import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
-import org.tessatech.tessa.framework.core.logging.LogMessageBuilder;
-import org.tessatech.tessa.framework.core.logging.context.ExternalCallAttributes;
+import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributes;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
@@ -63,60 +62,62 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 	{
 		ResponseEntity<?> responseEntity = convertResponseIntoResponseEntity(response);
 
-		JsonObject object = new JsonObject();
+		JsonObject logMessage = new JsonObject();
 
 		if (TransactionContextHolder.getContextOptional().isPresent())
 		{
-			addTransactionContextFields(TransactionContextHolder.getContextOptional(), object);
+			addTransactionContextFields(TransactionContextHolder.getContextOptional(), logMessage);
 		}
 
 		if (SecurityContextHolder.getContextOptional().isPresent())
 		{
-			addSecurityContextFields(SecurityContextHolder.getContextOptional(), object);
+			addSecurityContextFields(SecurityContextHolder.getContextOptional(), logMessage);
 		}
 
 		if (LoggingContextHolder.getContextOptional().isPresent())
 		{
-			addLoggingContextFields(LoggingContextHolder.getContextOptional(), object);
+			addLoggingContextFields(LoggingContextHolder.getContextOptional(), logMessage);
 		}
 		else if (doesResponseContainAnError(responseEntity))
 		{
-			addResponseFields(responseEntity.getBody(), object);
+			addResponseFields(responseEntity.getBody(), logMessage);
 		}
 		else if (responseEntity != null)
 		{
-			addIfNotNull(object, "httpStatusCode", responseEntity.getStatusCodeValue());
+			JsonObject res = new JsonObject();
+			addIfNotNull(res, "httpStatusCode", responseEntity.getStatusCodeValue());
+			logMessage.add("response", res);
 		}
 
 
-		return gson.toJson(object);
+		return gson.toJson(logMessage);
 	}
 
 	@Override
 	public String buildEventLog(Object response)
 	{
-		JsonObject object = new JsonObject();
+		JsonObject logMessage = new JsonObject();
 
 		if(EventContextHolder.getContextOptional().isPresent())
 		{
-			addEventContextFields(object, EventContextHolder.getContextOptional());
+			addEventContextFields(logMessage, EventContextHolder.getContextOptional());
 		}
 
 		if (LoggingContextHolder.getContextOptional().isPresent())
 		{
-			addLoggingContextFields(LoggingContextHolder.getContextOptional(), object);
+			addLoggingContextFields(LoggingContextHolder.getContextOptional(), logMessage);
 		}
 
-		return gson.toJson(object);
+		return gson.toJson(logMessage);
 	}
 
-	private void addEventContextFields(JsonObject object, Optional<EventContext> eventContextOptional)
+	private void addEventContextFields(JsonObject logMessage, Optional<EventContext> eventContextOptional)
 	{
 		EventContext eventContext = eventContextOptional.get();
-		addIfNotNull(object, "eventName", eventContext.getEventName());
-		addIfNotNull(object, "eventVersion", eventContext.getEventVersion());
-		addIfNotNull(object, "eventGroup", eventContext.getEventGroup());
-		addIfNotNull(object, "internalTraceId", eventContext.getInternalTraceId());
+		addIfNotNull(logMessage, "eventName", eventContext.getEventName());
+		addIfNotNull(logMessage, "eventVersion", eventContext.getEventVersion());
+		addIfNotNull(logMessage, "eventGroup", eventContext.getEventGroup());
+		addIfNotNull(logMessage, "internalTraceId", eventContext.getInternalTraceId());
 	}
 
 
@@ -131,19 +132,29 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		return null;
 	}
 
-	private void addSecurityContextFields(Optional<SecurityContext> securityContextOptional, JsonObject object)
+	private void addSecurityContextFields(Optional<SecurityContext> securityContextOptional, JsonObject logMessage)
 	{
 		SecurityContext securityContext = securityContextOptional.get();
 
-		addIfNotNull(object, "authenticationType", securityContext.getAuthenticationType());
-		addIfNotNull(object, "authenticationId", securityContext.getAuthenticationId());
+		JsonObject security = new JsonObject();
 
-		addIfNotNull(object, "userId", securityContext.getUserId());
-		addIfNotNull(object, "userName", securityContext.getUserName());
-		addSecurityRoles(object, securityContext);
+		JsonObject auth = new JsonObject();
+		addIfNotNull(auth, "type", securityContext.getAuthenticationType());
+		addIfNotNull(auth, "id", securityContext.getAuthenticationId());
+		security.add("auth", auth);
+
+		JsonObject user = new JsonObject();
+		addIfNotNull(user, "id", securityContext.getUserId());
+		addIfNotNull(user, "username", securityContext.getUserName());
+		addSecurityRoles(user, securityContext);
+		security.add("user", user);
+
+		logMessage.add("security", security);
+
+
 	}
 
-	private void addSecurityRoles(JsonObject object, SecurityContext securityContext)
+	private void addSecurityRoles(JsonObject user, SecurityContext securityContext)
 	{
 		if (securityContext.getUserRoles() != null)
 		{
@@ -152,64 +163,74 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 			{
 				rolesArray.add(securityContext.getUserRoles()[i].toString());
 			}
-			object.add("roles", rolesArray);
+			user.add("roles", rolesArray);
 		}
 	}
 
-	private void addTransactionContextFields(Optional<TransactionContext> transactionContextOptional, JsonObject object)
+	private void addTransactionContextFields(Optional<TransactionContext> transactionContextOptional, JsonObject logMessage)
 	{
 		TransactionContext transactionContext = transactionContextOptional.get();
 
-		addIfNotNull(object, "serviceName", transactionContext.getServiceName());
-		addIfNotNull(object, "serviceOperation", transactionContext.getServiceOperation());
-		addIfNotNull(object, "serviceVersion", transactionContext.getServiceVersion());
-		addIfNotNull(object, "serviceMethodName", transactionContext.getServiceMethodName());
+		addIfNotNull(logMessage, "serviceName", transactionContext.getServiceName());
+		addIfNotNull(logMessage, "serviceOperation", transactionContext.getServiceOperation());
+		addIfNotNull(logMessage, "serviceVersion", transactionContext.getServiceVersion());
+		addIfNotNull(logMessage, "serviceMethodName", transactionContext.getServiceMethodName());
 
 
-		addIfNotNull(object, "requestId", transactionContext.getRequestId());
-		addIfNotNull(object, "correlationId", transactionContext.getCorrelationId());
-		addIfNotNull(object, "internalTraceId", transactionContext.getInternalTraceId());
-		addIfNotNull(object, "sessionId", transactionContext.getSessionId());
+		JsonObject trace = new JsonObject();
+		addIfNotNull(trace, "requestId", transactionContext.getRequestId());
+		addIfNotNull(trace, "correlationId", transactionContext.getCorrelationId());
+		addIfNotNull(trace, "internalTraceId", transactionContext.getInternalTraceId());
+		addIfNotNull(trace, "sessionId", transactionContext.getSessionId());
+		addIfNotNull(trace, "sourceIp", transactionContext.getSourceIp());
+		addIfNotNull(trace, "clientIp", transactionContext.getClientIp());
+		addIfNotNull(trace, "deviceId", transactionContext.getDeviceId());
+		addIfNotNull(trace, "deviceType", transactionContext.getDeviceType());
+		logMessage.add("trace", trace);
 
-		addIfNotNull(object, "deviceId", transactionContext.getDeviceId());
-		addIfNotNull(object, "deviceType", transactionContext.getDeviceType());
 	}
 
-	private void addLoggingContextFields(Optional<LoggingContext> loggingContextOptional, JsonObject object)
+	private void addLoggingContextFields(Optional<LoggingContext> loggingContextOptional, JsonObject logMessage)
 	{
 		LoggingContext loggingContext = loggingContextOptional.get();
 
 		long endTime = System.currentTimeMillis();
-		addIfNotNull(object, "startTime", loggingContext.getStartTime());
-		addIfNotNull(object, "endTime", endTime);
-		addIfNotNull(object, "runtime", (endTime - loggingContext.getStartTime()));
 
-		object.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
-		object.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
-		object.add("externalCalls", getExternalCallsJson(loggingContext.getExternalLogAttributes()));
+		JsonObject timing = new JsonObject();
+		addIfNotNull(timing, "startTime", loggingContext.getStartTime());
+		addIfNotNull(timing, "endTime", endTime);
+		addIfNotNull(timing, "runtime", (endTime - loggingContext.getStartTime()));
+		timing.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
+		logMessage.add("timing", timing);
 
+
+		logMessage.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
+		logMessage.add("externalCalls", getExternalCallsJson(loggingContext.getExternalLogAttributes()));
+
+		JsonObject response = new JsonObject();
 		Throwable throwable = loggingContext.getThrowable();
 		if (throwable != null)
 		{
 			ThrowableAdapter adapter = ThrowableAdapterFinder.getThrowableAdapter(throwable);
 
 
-			addIfNotNull(object, "exceptionCode", adapter.getExceptionCode(throwable));
-			addIfNotNull(object, "exceptionMessage", adapter.getExceptionMessage(throwable));
+			addIfNotNull(response, "exceptionCode", adapter.getExceptionCode(throwable));
+			addIfNotNull(response, "exceptionMessage", adapter.getExceptionMessage(throwable));
 
 			if(adapter instanceof ExternalExceptionAdapter)
 			{
 				ExternalExceptionAdapter externalExceptionAdapter = (ExternalExceptionAdapter) adapter;
-				addIfNotNull(object, "externalExceptionCode", externalExceptionAdapter.getExternalExceptionCode(throwable));
-				addIfNotNull(object, "externalExceptionMessage", externalExceptionAdapter.getExternalExceptionMessage(throwable));
+				addIfNotNull(response, "externalExceptionCode", externalExceptionAdapter.getExternalExceptionCode(throwable));
+				addIfNotNull(response, "externalExceptionMessage", externalExceptionAdapter.getExternalExceptionMessage(throwable));
 			}
 
 			if(adapter instanceof RestThrowableAdapter)
 			{
-				addIfNotNull(object, "httpStatusCode", ((RestThrowableAdapter) adapter).getHttpStatus());
+				addIfNotNull(response, "httpStatusCode", ((RestThrowableAdapter) adapter).getHttpStatus());
 			}
 
-			object.add("stackTrace", getStackTraceJson(loggingContext.getThrowable()));
+			logMessage.add("response", response);
+			logMessage.add("stackTrace", getStackTraceJson(loggingContext.getThrowable()));
 		}
 	}
 
@@ -343,15 +364,18 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		return stackTrace;
 	}
 
-	private void addResponseFields(Object response, JsonObject object)
+	private void addResponseFields(Object response, JsonObject logMessage)
 	{
+		JsonObject jsonResponse = new JsonObject();
 		if (response instanceof TessaWebserviceResponse)
 		{
 			TessaError tessaTessaError = ((TessaWebserviceResponse) response).getError();
-			addIfNotNull(object, "httpStatusCode", tessaTessaError.httpStatus);
-			addIfNotNull(object, "exceptionCode", tessaTessaError.errorCode);
-			addIfNotNull(object, "exceptionMessage", tessaTessaError.errorMessage);
+			addIfNotNull(logMessage, "httpStatusCode", tessaTessaError.httpStatus);
+			addIfNotNull(logMessage, "exceptionCode", tessaTessaError.errorCode);
+			addIfNotNull(logMessage, "exceptionMessage", tessaTessaError.errorMessage);
 		}
+
+		logMessage.add("response", jsonResponse);
 	}
 
 }

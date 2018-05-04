@@ -14,9 +14,11 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.logging.context;
+package org.tessatech.tessa.framework.core.logging.external;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 
 public class ExternalCallAttributesBuilder
 {
@@ -31,6 +33,7 @@ public class ExternalCallAttributesBuilder
 	private String externalTraceId;
 	private long startTime;
 	private Throwable throwable;
+	private boolean isSuccess = true;
 
 	public ExternalCallAttributesBuilder(String systemName, String serviceName, String serviceMethod, String serviceOperation, String serviceVersion)
 	{
@@ -105,20 +108,41 @@ public class ExternalCallAttributesBuilder
 		return this;
 	}
 
+	public ExternalCallAttributesBuilder setHttpStatusCodeException(HttpStatusCodeException exception)
+	{
+		setHttpStatusCode(exception.getStatusCode());
+		setThrowable(exception);
+		return this;
+	}
+
 	public ExternalCallAttributesBuilder setThrowable(Throwable throwable)
 	{
 		this.throwable = throwable;
 		return this;
 	}
 
-	private ExternalCallAttributes build(boolean wasSuccessful)
+	public ExternalCallAttributesBuilder setSuccess(boolean isSuccess)
+	{
+		this.isSuccess = isSuccess;
+		return this;
+	}
+
+	private ExternalCallAttributes build()
 	{
 		long endTime = System.currentTimeMillis();
-		return new ExternalCallAttributes(systemName, serviceName, serviceOperation, serviceVersion, serviceMethod, wasSuccessful, httpStatusCode, externalResponseCode, externalResponseMessage, externalTraceId, startTime, endTime, (endTime - startTime), throwable);
+		return new ExternalCallAttributes(systemName, serviceName, serviceOperation, serviceVersion, serviceMethod,
+				isSuccess, httpStatusCode, externalResponseCode, externalResponseMessage, externalTraceId, startTime,
+				endTime, (endTime - startTime), throwable);
 	}
 
 	public void buildAndCommit(boolean success)
 	{
-		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addExternalCall(build(success)));
+		isSuccess = success;
+		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addExternalCall(build()));
+	}
+
+	public void buildAndCommit()
+	{
+		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addExternalCall(build()));
 	}
 }

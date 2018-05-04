@@ -18,8 +18,16 @@ package org.tessatech.tessa.framework.core.util;
 
 import com.google.gson.Gson;
 import io.atlassian.fugue.Either;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.tessatech.tessa.framework.core.logging.context.ExternalCallAttributesBuilder;
+import org.tessatech.tessa.framework.core.event.context.EventContext;
+import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
+import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
+import org.tessatech.tessa.framework.core.security.context.SecurityContext;
+import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
+import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
+import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
+import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 import org.tessatech.tessa.framework.rest.response.TessaError;
 import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 
@@ -28,6 +36,58 @@ import java.util.Optional;
 public class RestClientUtils
 {
 	private static final Gson gson = new Gson();
+
+	public static TessaHttpHeaders buildTessaHttpHeaders()
+	{
+		TessaHttpHeaders headers = new TessaHttpHeaders();
+		EventContextHolder.getContextOptional().ifPresent(context -> populateTessaHeaders(headers, context));
+		TransactionContextHolder.getContextOptional().ifPresent(context -> populateTessaHeaders(headers, context));
+		return headers;
+	}
+
+	public static HttpHeaders buildHttpHeaders()
+	{
+		return buildTessaHttpHeaders().getHeaders();
+	}
+
+	public static TessaHttpHeaders buildTessaHttpHeadersWithAuth()
+	{
+		TessaHttpHeaders headers = buildTessaHttpHeaders();
+		addClientAuthToHeaders(headers);
+		return headers;
+	}
+
+	public static HttpHeaders buildHttpHeadersWithAuth()
+	{
+		return buildTessaHttpHeadersWithAuth().getHeaders();
+	}
+
+	public static TessaHttpHeaders addClientAuthToHeaders(TessaHttpHeaders headers)
+	{
+		SecurityContext context = SecurityContextHolder.getContext();
+		String token = context.getAuthenticationScheme() + " " + context.getAuthenticationToken();
+		headers.setAuthorization(token);
+		return  headers;
+	}
+
+	public static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, TransactionContext context)
+	{
+		headers.setRequestId(context.getRequestId());
+		headers.setCorrelationId(context.getCorrelationId());
+		headers.setSessionId(context.getSessionId());
+		headers.setClientIp(context.getClientIp());
+		headers.setDeviceId(context.getDeviceId());
+		headers.setDeviceType(context.getDeviceType());
+		return headers;
+	}
+
+	public static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, EventContext context)
+	{
+		headers.setRequestId(String.valueOf(context.getInternalTraceId()));
+		headers.setCorrelationId(String.valueOf(context.getInternalTraceId()));
+		return headers;
+	}
+
 
 	private static <T> Either<TessaWebserviceResponse, T> parseTessaRestResponse(ResponseEntity<String> response, Class<T> successClass)
 	{

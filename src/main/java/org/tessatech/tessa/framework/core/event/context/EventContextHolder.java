@@ -35,6 +35,11 @@ public class EventContextHolder
 		eventContextLocal.remove();
 	}
 
+	public static boolean isPresent()
+	{
+		return (eventContextLocal.get() != null);
+	}
+
 	public static EventContext getContext()
 	{
 		EventContext context = eventContextLocal.get();

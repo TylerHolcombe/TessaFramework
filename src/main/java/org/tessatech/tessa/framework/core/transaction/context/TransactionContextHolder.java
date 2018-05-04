@@ -35,6 +35,11 @@ public class TransactionContextHolder
 		transactionContextLocal.remove();
 	}
 
+	public static boolean isPresent()
+	{
+		return (transactionContextLocal.get() != null);
+	}
+
 	public static TransactionContext getContext()
 	{
 		TransactionContext context = transactionContextLocal.get();

@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.core.logging.builder.LogMessageBuilder;
 import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
 
 @Component

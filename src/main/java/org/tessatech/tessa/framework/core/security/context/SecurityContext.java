@@ -18,23 +18,28 @@ package org.tessatech.tessa.framework.core.security.context;
 
 public class SecurityContext
 {
-	private final String authenticationType;
+	private final AuthenticationType authenticationType;
 	private final String authenticationId;
-
+	private final String authenticationScheme;
+	private final String authenticationToken;
 	private final String userId;
 	private final String userName;
 	private final String[] userRoles;
 
-	public SecurityContext(String authenticationType, String authenticationId, String userId, String userName, String[] userRoles)
+	public SecurityContext(AuthenticationType authenticationType, String authenticationId, String authenticationScheme,
+			String authenticationToken, String userId, String userName, String[] userRoles)
 	{
 		this.authenticationType = authenticationType;
 		this.authenticationId = authenticationId;
+		this.authenticationScheme = authenticationScheme;
+		this.authenticationToken = authenticationToken;
+
 		this.userId = userId;
 		this.userName = userName;
 		this.userRoles = userRoles;
 	}
 
-	public String getAuthenticationType()
+	public AuthenticationType getAuthenticationType()
 	{
 		return authenticationType;
 	}
@@ -42,6 +47,16 @@ public class SecurityContext
 	public String getAuthenticationId()
 	{
 		return authenticationId;
+	}
+
+	public String getAuthenticationScheme()
+	{
+		return authenticationScheme;
+	}
+
+	public String getAuthenticationToken()
+	{
+		return authenticationToken;
 	}
 
 	public String getUserId()

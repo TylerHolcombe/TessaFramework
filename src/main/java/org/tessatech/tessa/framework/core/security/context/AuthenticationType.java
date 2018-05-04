@@ -14,11 +14,9 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.logging;
+package org.tessatech.tessa.framework.core.security.context;
 
-public interface LogMessageBuilder
+public enum AuthenticationType
 {
-	public String buildTransactionLog(Object response);
-
-	public String buildEventLog(Object response);
+	JWT;
 }

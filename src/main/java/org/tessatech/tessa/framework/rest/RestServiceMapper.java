@@ -67,7 +67,7 @@ public class RestServiceMapper
 		return new TransactionContext(transaction.serviceName(), transaction.serviceOperation(),
 				transaction.serviceVersion(), transaction.serviceMethodName(), headers.getRequestId(),
 				headers.getCorrelationId(), headers.getSessionId(), internalTraceId, getClientIp(headers),
-				headers.getDeviceId(), headers.getDeviceType());
+				getSourceIp(), headers.getDeviceId(), headers.getDeviceType());
 
 	}
 
@@ -104,5 +104,14 @@ public class RestServiceMapper
 			clientIp = httpServletRequest.getRemoteAddr();
 		}
 		return clientIp;
+	}
+
+	private String getSourceIp()
+	{
+		if (httpServletRequest != null)
+		{
+			return httpServletRequest.getRemoteAddr();
+		}
+		return null;
 	}
 }

@@ -29,12 +29,14 @@ public class TransactionContext
 	private final long internalTraceId;
 
 	private final String clientIp;
+	private final String sourceIp;
+
 	private final String deviceId;
 	private final String deviceType;
 
 	public TransactionContext(String serviceName, String serviceOperation, String serviceVersion,
 			String serviceMethodName, String requestId, String correlationId, String sessionId, long internalTraceId,
-			String clientIp, String deviceId, String deviceType)
+			String clientIp, String sourceIp, String deviceId, String deviceType)
 	{
 		this.serviceName = serviceName;
 		this.serviceOperation = serviceOperation;
@@ -44,6 +46,7 @@ public class TransactionContext
 		this.correlationId = correlationId;
 		this.sessionId = sessionId;
 		this.internalTraceId = internalTraceId;
+		this.sourceIp = sourceIp;
 		this.clientIp = clientIp;
 		this.deviceId = deviceId;
 		this.deviceType = deviceType;
@@ -90,6 +93,11 @@ public class TransactionContext
 	}
 
 	public String getClientIp()
+	{
+		return clientIp;
+	}
+
+	public String getSourceIp()
 	{
 		return clientIp;
 	}

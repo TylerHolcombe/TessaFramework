@@ -36,6 +36,11 @@ public class SecurityContextHolder
 		securityContextLocal.remove();
 	}
 
+	public static boolean isPresent()
+	{
+		return (securityContextLocal.get() != null);
+	}
+
 	public static SecurityContext getContext()
 	{
 		SecurityContext context = securityContextLocal.get();

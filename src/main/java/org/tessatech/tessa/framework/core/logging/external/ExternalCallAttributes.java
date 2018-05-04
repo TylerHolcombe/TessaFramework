@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.logging.context;
+package org.tessatech.tessa.framework.core.logging.external;
 
 public class ExternalCallAttributes
 {

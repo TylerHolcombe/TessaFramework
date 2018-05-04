@@ -17,29 +17,33 @@
 package org.tessatech.tessa.framework.core.logging.context;
 
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
-import org.tessatech.tessa.framework.core.exception.system.InternalException;
 
 import java.util.Optional;
 
 public class LoggingContextHolder
 {
 
-	private static final ThreadLocal<LoggingContext> LoggingContextLocal = new ThreadLocal<>();
+	private static final ThreadLocal<LoggingContext> loggingContextLocal = new ThreadLocal<>();
 
 	public static void setContext(LoggingContext context)
 	{
-		LoggingContextLocal.set(context);
+		loggingContextLocal.set(context);
 	}
 
 	public static void clearContext()
 	{
-		LoggingContextLocal.set(null);
-		LoggingContextLocal.remove();
+		loggingContextLocal.set(null);
+		loggingContextLocal.remove();
+	}
+
+	public static boolean isPresent()
+	{
+		return (loggingContextLocal.get() != null);
 	}
 
 	public static LoggingContext getContext()
 	{
-		LoggingContext context = LoggingContextLocal.get();
+		LoggingContext context = loggingContextLocal.get();
 
 		if (context == null)
 		{
@@ -51,7 +55,7 @@ public class LoggingContextHolder
 
 	public static Optional<LoggingContext> getContextOptional()
 	{
-		return Optional.ofNullable(LoggingContextLocal.get());
+		return Optional.ofNullable(loggingContextLocal.get());
 	}
 
 }
