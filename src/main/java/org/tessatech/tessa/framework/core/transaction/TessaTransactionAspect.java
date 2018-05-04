@@ -39,6 +39,8 @@ import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter
 import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Aspect
 @Component

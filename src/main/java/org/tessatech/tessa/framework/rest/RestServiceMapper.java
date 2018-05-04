@@ -16,6 +16,7 @@
 
 package org.tessatech.tessa.framework.rest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,14 @@ import org.tessatech.tessa.framework.rest.response.DefaultTessaWebserviceRespons
 import org.tessatech.tessa.framework.rest.response.TessaError;
 import org.tessatech.tessa.framework.rest.response.TessaWebserviceResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Component
 public class RestServiceMapper
 {
+
+	@Autowired
+	private HttpServletRequest httpServletRequest;
 
 	public TransactionContext mapInboundRequestToContext(TessaTransaction transaction, RequestEntity requestEntity)
 	{
@@ -58,14 +64,15 @@ public class RestServiceMapper
 
 		long internalTraceId = UniqueIdentifierUtils.getUniqueId();
 
-		return new TransactionContext(transaction.serviceName(), transaction.serviceOperation(), transaction.serviceVersion(),
-				transaction.serviceMethodName(), headers.getRequestId(), headers.getCorrelationId(), headers.getSessionId(),
-				internalTraceId, headers.getDeviceId(),
-				headers.getDeviceType());
+		return new TransactionContext(transaction.serviceName(), transaction.serviceOperation(),
+				transaction.serviceVersion(), transaction.serviceMethodName(), headers.getRequestId(),
+				headers.getCorrelationId(), headers.getSessionId(), internalTraceId, getClientIp(headers),
+				headers.getDeviceId(), headers.getDeviceType());
 
 	}
 
-	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(ThrowableAdapter details, Throwable throwable)
+	public ResponseEntity<TessaWebserviceResponse> mapTessaExceptionResponse(ThrowableAdapter details,
+			Throwable throwable)
 	{
 		long internalTraceId = 0;
 
@@ -87,5 +94,15 @@ public class RestServiceMapper
 
 
 		return new ResponseEntity<TessaWebserviceResponse>(response, status);
+	}
+
+	private String getClientIp(TessaHttpHeaders headers)
+	{
+		String clientIp = headers.getClientIp();
+		if (httpServletRequest != null && (clientIp == null || clientIp.isEmpty()))
+		{
+			clientIp = httpServletRequest.getRemoteAddr();
+		}
+		return clientIp;
 	}
 }

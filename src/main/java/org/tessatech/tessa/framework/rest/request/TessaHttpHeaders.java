@@ -29,6 +29,8 @@ public class TessaHttpHeaders
 	private static final String SESSION_ID = "X-Session-ID";
 	private static final String INTERNAL_TRACE_ID = "INTERNAL-TRACE-ID";
 
+	private static final String CLIENT_IP = "X-Forwarded-For";
+
 	private static final String DEVICE_ID = "Device-ID";
 	private static final String DEVICE_TYPE = "Device-Type";
 
@@ -95,6 +97,16 @@ public class TessaHttpHeaders
 	public void setInternalTraceId(String value)
 	{
 		headers.set(INTERNAL_TRACE_ID, value);
+	}
+
+	public String getClientIp()
+	{
+		return headers.getFirst(CLIENT_IP);
+	}
+
+	public void setClientIp(String value)
+	{
+		headers.set(CLIENT_IP, value);
 	}
 
 	public String getDeviceId()
