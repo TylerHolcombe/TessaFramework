@@ -329,6 +329,23 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		addIfNotNull(externalCall, "serviceVersion", attributes.serviceVersion);
 		addIfNotNull(externalCall, "success", attributes.success);
 
+		JsonObject trace = new JsonObject();
+		JsonObject request = new JsonObject();
+		addIfNotNull(request, "traceId", attributes.requestTraceId);
+		addIfNotNull(request, "correlationId", attributes.requestCorrelationId);
+		addIfNotNull(request, "sessionId", attributes.requestSessionId);
+		addIfNotNull(request, "clientIp", attributes.requestDeviceId);
+		addIfNotNull(request, "deviceId", attributes.requestDeviceId);
+		addIfNotNull(request, "deviceType", attributes.requestDeviceType);
+		trace.add("request", request);
+
+		JsonObject responseTrace = new JsonObject();
+		addIfNotNull(responseTrace, "externalTraceId", attributes.externalTraceId);
+		trace.add("response", responseTrace);
+
+		externalCall.add("trace", trace);
+
+
 		JsonObject timings = new JsonObject();
 		addIfNotNull(timings, "startTime", attributes.startTime);
 		addIfNotNull(timings, "endTime", attributes.endTime);
@@ -339,12 +356,11 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		addIfNotNull(response, "httpStatusCode", attributes.httpStatusCode);
 		addIfNotNull(response, "externalResponseCode", attributes.externalResponseCode);
 		addIfNotNull(response, "externalResponseMessage", attributes.externalResponseMessage);
-		addIfNotNull(response, "externalTraceId", attributes.externalTraceId);
 		externalCall.add("externalResponse", response);
 
 		if(attributes.throwable != null)
 		{
-			externalCall.add("stackTrace", getStackTraceJson(attributes.throwable));
+			externalCall.add("clientStackTrace", getStackTraceJson(attributes.throwable));
 		}
 		return externalCall;
 	}

@@ -16,9 +16,11 @@
 
 package org.tessatech.tessa.framework.core.logging.external;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
+import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 
 public class ExternalCallAttributesBuilder
 {
@@ -31,6 +33,14 @@ public class ExternalCallAttributesBuilder
 	private String externalResponseCode;
 	private String externalResponseMessage;
 	private String externalTraceId;
+
+	private String requestTraceId;
+	private String requestCorrelationId;
+	private String requestSessionId;
+	private String requestClientIp;
+	private String requestDeviceId;
+	private String requestDeviceType;
+
 	private long startTime;
 	private Throwable throwable;
 	private boolean isSuccess = true;
@@ -45,19 +55,21 @@ public class ExternalCallAttributesBuilder
 		this.serviceOperation = serviceOperation;
 	}
 
-	public ExternalCallAttributesBuilder(String systemName, String serviceName, String serviceMethod, String serviceOperation)
+	public ExternalCallAttributesBuilder setHeaderInformation(TessaHttpHeaders headers)
 	{
-		this(systemName, serviceName, serviceMethod, serviceOperation, null);
+		requestTraceId = headers.getRequestId();
+		requestCorrelationId = headers.getCorrelationId();
+		requestSessionId = headers.getSessionId();
+		requestClientIp = headers.getClientIp();
+		requestDeviceId = headers.getDeviceId();
+		requestDeviceType = headers.getDeviceType();
+
+		return this;
 	}
 
-	public ExternalCallAttributesBuilder(String systemName, String serviceMethod, String serviceOperation)
+	public ExternalCallAttributesBuilder setHeaderInformation(HttpHeaders headers)
 	{
-		this(systemName, null, serviceMethod, serviceOperation, null);
-	}
-
-	public ExternalCallAttributesBuilder(String systemName, String serviceMethod)
-	{
-		this(systemName, null, serviceMethod,null, null);
+		return setHeaderInformation(new TessaHttpHeaders(headers));
 	}
 
 	public ExternalCallAttributesBuilder setHttpStatusCode(HttpStatus httpStatusCode)
@@ -127,14 +139,6 @@ public class ExternalCallAttributesBuilder
 		return this;
 	}
 
-	private ExternalCallAttributes build()
-	{
-		long endTime = System.currentTimeMillis();
-		return new ExternalCallAttributes(systemName, serviceName, serviceOperation, serviceVersion, serviceMethod,
-				isSuccess, httpStatusCode, externalResponseCode, externalResponseMessage, externalTraceId, startTime,
-				endTime, (endTime - startTime), throwable);
-	}
-
 	public void buildAndCommit(boolean success)
 	{
 		isSuccess = success;
@@ -144,5 +148,15 @@ public class ExternalCallAttributesBuilder
 	public void buildAndCommit()
 	{
 		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addExternalCall(build()));
+	}
+
+	private ExternalCallAttributes build()
+	{
+		long endTime = System.currentTimeMillis();
+		long runtime = endTime - startTime;
+		return new ExternalCallAttributes(systemName, serviceName, serviceOperation, serviceVersion, serviceMethod,
+				isSuccess, httpStatusCode, externalResponseCode, externalResponseMessage, requestTraceId,
+				requestCorrelationId, requestSessionId, requestClientIp, requestDeviceId, requestDeviceType,
+				externalTraceId, startTime, endTime, runtime, throwable);
 	}
 }

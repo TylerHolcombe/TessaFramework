@@ -22,7 +22,7 @@ import org.springframework.http.HttpMethod;
 import org.tessatech.tessa.framework.core.exception.system.ExternalException;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
-import org.tessatech.tessa.framework.rest.util.RestClientUtils;
+import org.tessatech.tessa.framework.rest.util.RestUtils;
 import org.tessatech.tessa.framework.rest.response.TessaError;
 import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
@@ -78,10 +78,10 @@ public class TessaRestClient extends AbstractRestClient<TessaErrorResponse>
 	{
 		if (SecurityContextHolder.isPresent())
 		{
-			return RestClientUtils.buildHttpHeadersWithAuth();
+			return RestUtils.buildHttpHeadersWithAuth();
 		}
 
-		return RestClientUtils.buildHttpHeaders();
+		return RestUtils.buildHttpHeaders();
 	}
 
 	@Override

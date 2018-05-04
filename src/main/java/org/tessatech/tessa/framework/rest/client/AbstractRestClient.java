@@ -106,6 +106,7 @@ public abstract class AbstractRestClient<ErrorResponse>
 		ExternalCallAttributesBuilder builder =
 				new ExternalCallAttributesBuilder(systemName, serviceName, serviceMethodName, method.name(),
 						serviceVersion);
+		builder.setHeaderInformation(headers);
 
 		Either<ErrorResponse, SuccessfulResponse> responseEither = null;
 		try

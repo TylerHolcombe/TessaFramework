@@ -27,13 +27,14 @@ import org.tessatech.tessa.framework.core.security.context.SecurityContext;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
+import org.tessatech.tessa.framework.core.util.UniqueIdentifierUtils;
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 import org.tessatech.tessa.framework.rest.response.TessaError;
 import org.tessatech.tessa.framework.rest.response.TessaErrorResponse;
 
 import java.util.Optional;
 
-public class RestClientUtils
+public class RestUtils
 {
 	private static final Gson gson = new Gson();
 
@@ -62,63 +63,55 @@ public class RestClientUtils
 		return buildTessaHttpHeadersWithAuth().getHeaders();
 	}
 
-	public static TessaHttpHeaders addClientAuthToHeaders(TessaHttpHeaders headers)
+	private static TessaHttpHeaders addClientAuthToHeaders(TessaHttpHeaders headers)
 	{
 		SecurityContext context = SecurityContextHolder.getContext();
+
+		//TODO This needs to be moved into a service/util, not hacked in here.
 		String token = context.getAuthenticationScheme() + " " + context.getAuthenticationToken();
 		headers.setAuthorization(token);
+
+		return  addClientTraceDetailsToHeaders(headers);
+	}
+
+	public static TessaHttpHeaders addClientTraceDetailsToHeaders(TessaHttpHeaders headers)
+	{
+		if(TransactionContextHolder.isPresent())
+		{
+			TransactionContext context = TransactionContextHolder.getContext();
+			headers.setSessionId(context.getSessionId());
+			headers.setClientIp(context.getClientIp());
+			headers.setDeviceId(context.getDeviceId());
+			headers.setDeviceType(context.getDeviceType());
+		}
+
 		return  headers;
 	}
 
-	public static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, TransactionContext context)
+	private static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, TransactionContext context)
 	{
-		headers.setRequestId(context.getRequestId());
+		String requestId = String.valueOf(UniqueIdentifierUtils.getUniqueId());
+		String correlationId = context.getCorrelationId();
+
+		if(correlationId == null)
+		{
+			correlationId = requestId;
+		}
+
+		headers.setRequestId(requestId);
 		headers.setCorrelationId(context.getCorrelationId());
 		headers.setSessionId(context.getSessionId());
-		headers.setClientIp(context.getClientIp());
-		headers.setDeviceId(context.getDeviceId());
-		headers.setDeviceType(context.getDeviceType());
+
 		return headers;
 	}
 
-	public static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, EventContext context)
+	private static TessaHttpHeaders populateTessaHeaders(TessaHttpHeaders headers, EventContext context)
 	{
-		headers.setRequestId(String.valueOf(context.getInternalTraceId()));
-		headers.setCorrelationId(String.valueOf(context.getInternalTraceId()));
+		String requestId = String.valueOf(UniqueIdentifierUtils.getUniqueId());
+
+		headers.setRequestId(requestId);
+		headers.setCorrelationId(requestId);
 		return headers;
-	}
-
-
-	private static <T> Either<TessaErrorResponse, T> parseTessaRestResponse(ResponseEntity<String> response, Class<T> successClass)
-	{
-		if (!response.getStatusCode().is1xxInformational() && !response.getStatusCode().is2xxSuccessful())
-		{
-			return Either.left(gson.fromJson(response.getBody(), TessaErrorResponse.class));
-		}
-
-		return Either.right(gson.fromJson(response.getBody(), successClass));
-
-	}
-
-	public static <T> Optional<T> parseAndProcessTessaRestResponse(ResponseEntity<String> response, ExternalCallAttributesBuilder attributes, Class<T> successClass)
-	{
-		attributes.setHttpStatusCode(response.getStatusCode().value());
-
-		Either<TessaErrorResponse, T> eitherErrorOrSecret = parseTessaRestResponse(response, successClass);
-
-		if (eitherErrorOrSecret.isLeft())
-		{
-			TessaError error = eitherErrorOrSecret.left().get().getError();
-			attributes.setExternalResponseCode(error.errorCode);
-			attributes.setExternalResponseMessage(error.errorMessage);
-			attributes.setExternalTraceId(error.internalErrorId);
-			attributes.buildAndCommit(false);
-			return Optional.empty();
-		}
-
-		attributes.buildAndCommit(true);
-		return Optional.ofNullable(eitherErrorOrSecret.right().get());
-
 	}
 
 }
