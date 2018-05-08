@@ -16,10 +16,7 @@
 
 package org.tessatech.tessa.framework.core.logging.builder;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +27,10 @@ import org.tessatech.tessa.framework.core.event.context.EventContextHolder;
 import org.tessatech.tessa.framework.core.exception.adapter.ExternalExceptionAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapter;
 import org.tessatech.tessa.framework.core.exception.adapter.ThrowableAdapterFinder;
-import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributes;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContext;
 import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
+import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributes;
 import org.tessatech.tessa.framework.core.security.context.SecurityContext;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
@@ -117,7 +114,10 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		addIfNotNull(logMessage, "eventName", eventContext.getEventName());
 		addIfNotNull(logMessage, "eventVersion", eventContext.getEventVersion());
 		addIfNotNull(logMessage, "eventGroup", eventContext.getEventGroup());
-		addIfNotNull(logMessage, "internalTraceId", eventContext.getInternalTraceId());
+
+		JsonObject trace = new JsonObject();
+		addIfNotNull(trace, "internalTraceId", eventContext.getInternalTraceId());
+		logMessage.add("trace", trace);
 	}
 
 
@@ -203,7 +203,7 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		timings.add("runtimes", getRuntimes(loggingContext.getRuntimes()));
 		logMessage.add("timings", timings);
 
-
+		logMessage.add("events", getEventJson(loggingContext.getEvents()));
 		logMessage.add("keyValue", getKeyValueJson(loggingContext.getKeyValueFields()));
 		logMessage.add("externalCalls", getExternalCallsJson(loggingContext.getExternalLogAttributes()));
 
@@ -270,6 +270,24 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		{
 			object.addProperty(key, value);
 		}
+	}
+
+	private JsonElement getEventJson(List<String> events)
+	{
+		if (events != null && events.size() > 0)
+		{
+			JsonArray eventJson = new JsonArray();
+			for (String event : events)
+			{
+				if (event != null && !event.isEmpty())
+				{
+					eventJson.add(event);
+				}
+			}
+			return eventJson;
+		}
+
+		return null;
 	}
 
 	private JsonObject getKeyValueJson(Set<Map.Entry<String, Object>> kvPairs)

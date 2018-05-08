@@ -26,6 +26,7 @@ public class LoggingContext
 {
 	private long startTime;
 
+	private List<String> events = new ArrayList<>();
 	private Map<String, Object> keyValueFields = new HashMap<>();
 	private Map<String, Long> runtimes = new HashMap<>();
 	private List<ExternalCallAttributes> externalLogAttributes = new ArrayList<>();
@@ -40,6 +41,16 @@ public class LoggingContext
 	public long getStartTime()
 	{
 		return startTime;
+	}
+
+	public void addEvent(String message)
+	{
+		events.add(message);
+	}
+
+	public List<String> getEvents()
+	{
+		return events;
 	}
 
 	public void addField(String key, Object value)

@@ -44,7 +44,7 @@ public class IAMServiceClient
 
 	private TessaRestClient client = new TessaRestClient("IAM Service");
 
-	@TessaEvent(eventName = "retrieveLatestSecret", eventGroup = "iam")
+	@TessaEvent(eventName = "retrieveLatestSecret", eventGroup = "Framework")
 	public Optional<Secret> retrieveLatestSecret()
 	{
 		try

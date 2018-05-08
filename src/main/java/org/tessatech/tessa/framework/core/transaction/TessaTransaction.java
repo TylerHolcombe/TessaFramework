@@ -16,6 +16,7 @@
 
 package org.tessatech.tessa.framework.core.transaction;
 
+import org.springframework.core.annotation.Order;
 import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 
 import java.lang.annotation.ElementType;
@@ -25,6 +26,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Order(value = 100)
 public @interface TessaTransaction
 {
 	String serviceName();

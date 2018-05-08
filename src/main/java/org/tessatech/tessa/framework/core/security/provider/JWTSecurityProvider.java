@@ -175,8 +175,11 @@ public class JWTSecurityProvider implements SecurityProvider
 
 	void updateSecret(Secret secret)
 	{
-		previousAlgorithm = getAlgorithm(secret.previousSecret);
-		previousVerifier = getVerifier(previousAlgorithm);
+		if(secret.previousSecret != null)
+		{
+			previousAlgorithm = getAlgorithm(secret.previousSecret);
+			previousVerifier = getVerifier(previousAlgorithm);
+		}
 
 		currentAlgorithm = getAlgorithm(secret.currentSecret);
 		currentVerifier = getVerifier(currentAlgorithm);

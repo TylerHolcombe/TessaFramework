@@ -50,12 +50,13 @@ public class TessaEventAspect
 	}
 
 	@Around("anyPublicMethod() && @annotation(tessaEvent)")
-	public Object tessaTransaction(ProceedingJoinPoint proceedingJoinPoint, TessaEvent tessaEvent)
+	public Object tessaTransaction(ProceedingJoinPoint proceedingJoinPoint, TessaEvent tessaEvent) throws Throwable
 	{
 		boolean setLoggingContext = false;
 		boolean setEventContext = false;
 
 		Object response = null;
+		Throwable throwable = null;
 
 		try
 		{
@@ -66,18 +67,24 @@ public class TessaEventAspect
 
 				response = proceedingJoinPoint.proceed();
 			}
-			catch (Throwable throwable)
+			catch (Throwable t)
 			{
-				handleThrowable(tessaEvent, throwable);
+				handleThrowable(tessaEvent, t);
+				throwable = t;
 			}
 			finally
 			{
 				endEvent(setLoggingContext, setEventContext, response);
 			}
 		}
-		catch (Throwable throwable)
+		catch (Throwable t)
 		{
-			logger.error("Exception occurred while attempting to end an Event: " + tessaEvent.eventName(), throwable);
+			logger.error("Exception occurred while attempting to end an Event: " + tessaEvent.eventName(), t);
+		}
+
+		if (throwable != null)
+		{
+			throw throwable;
 		}
 
 		return response;

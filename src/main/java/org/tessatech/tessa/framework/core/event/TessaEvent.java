@@ -16,6 +16,8 @@
 
 package org.tessatech.tessa.framework.core.event;
 
+import org.springframework.core.annotation.Order;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,6 +25,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Order(value = 101)
 public @interface TessaEvent
 {
 	String eventGroup() default "";

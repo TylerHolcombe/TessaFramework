@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
+import org.tessatech.tessa.framework.core.event.TessaEvent;
 import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
 import org.tessatech.tessa.framework.core.security.client.container.Secret;
 
