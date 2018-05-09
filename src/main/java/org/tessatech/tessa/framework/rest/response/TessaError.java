@@ -18,7 +18,7 @@ package org.tessatech.tessa.framework.rest.response;
 
 public class TessaError
 {
-	public TessaError(String httpStatus, long errorCode, String errorMessage, long internalErrorId)
+	public TessaError(int httpStatus, long errorCode, String errorMessage, long internalErrorId)
 	{
 		this.httpStatus = httpStatus;
 		this.errorCode = errorCode;
@@ -26,7 +26,7 @@ public class TessaError
 		this.internalErrorId = internalErrorId;
 	}
 
-	public String httpStatus;
+	public int httpStatus;
 	public long errorCode;
 	public String errorMessage;
 	public long internalErrorId;

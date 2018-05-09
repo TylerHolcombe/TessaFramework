@@ -41,7 +41,7 @@ public class TessaExceptionCodes
 
 	public static final HttpStatus NOT_FOUND_HTTP_STATUS = HttpStatus.NOT_FOUND;
 	public static final long NOT_FOUND_CODE = 110;
-	public static final String NOT_FOUND_MESSAGE = "The URI requested is invalid or the resource does not exist";
+	public static final String NOT_FOUND_MESSAGE = "The URI requested is invalid or the resource does not exist.";
 
 	public static final HttpStatus NOT_IMPLEMENTED_HTTP_STATUS = HttpStatus.NOT_IMPLEMENTED;
 	public static final long NOT_IMPLEMENTED_CODE = 210;
@@ -73,7 +73,7 @@ public class TessaExceptionCodes
 
 	public static final HttpStatus EXTERNAL_TIMEOUT_HTTP_STATUS = HttpStatus.GATEWAY_TIMEOUT;
 	public static final long EXTERNAL_TIMEOUT_CODE = 530;
-	public static final String EXTERNAL_TIMEOUT_MESSAGE = "An timeout occurred while connecting to an external server while processing your request.";
+	public static final String EXTERNAL_TIMEOUT_MESSAGE = "A timeout occurred while connecting to an external server while processing your request.";
 
 	public static final HttpStatus INTERNAL_ERROR_HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
 	public static final long INTERNAL_ERROR_CODE = 610;

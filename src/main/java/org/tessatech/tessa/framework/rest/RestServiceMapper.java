@@ -86,7 +86,7 @@ public class RestServiceMapper
 			status = ((RestThrowableAdapter) details).getHttpStatus();
 		}
 
-		TessaError tessaError = new TessaError(String.valueOf(status.value()), details.getExceptionCode(throwable),
+		TessaError tessaError = new TessaError(status.value(), details.getExceptionCode(throwable),
 				details.getExceptionMessage(throwable), internalTraceId);
 
 		TessaErrorResponse response = new TessaErrorResponse(tessaError);
