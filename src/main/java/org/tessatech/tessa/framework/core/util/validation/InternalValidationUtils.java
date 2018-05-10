@@ -21,6 +21,11 @@ import org.tessatech.tessa.framework.core.exception.system.InternalException;
 public class InternalValidationUtils extends AbstractValidationUtils
 {
 
+	private InternalValidationUtils()
+	{
+
+	}
+
 	private static InternalValidationUtils instance = new InternalValidationUtils();
 
 	public static InternalValidationUtils getInstance()

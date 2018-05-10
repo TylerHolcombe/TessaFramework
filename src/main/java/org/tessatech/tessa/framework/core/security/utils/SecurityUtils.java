@@ -35,6 +35,18 @@ public class SecurityUtils
 		}
 	}
 
+	public static void validateUserHasUsername(String username)
+	{
+		validateUserIsSignedIn();
+
+		InternalValidationUtils.getInstance().isNotTrimmedEmpty("username", username);
+
+		if(!SecurityContextHolder.getContext().getUserName().equals(username))
+		{
+			throw new InsufficientAuthorizationException("User has a different username.");
+		}
+	}
+
 	public static void validateUserHasRole(String roleName)
 	{
 		validateUserIsSignedIn();

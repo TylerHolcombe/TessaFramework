@@ -21,6 +21,11 @@ import org.tessatech.tessa.framework.core.exception.logic.ValidationException;
 public class RequestValidationUtils extends AbstractValidationUtils
 {
 
+	private RequestValidationUtils()
+	{
+
+	}
+
 	private static RequestValidationUtils instance = new RequestValidationUtils();
 
 	public static RequestValidationUtils getInstance()
