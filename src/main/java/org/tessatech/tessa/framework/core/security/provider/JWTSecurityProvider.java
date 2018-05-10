@@ -72,14 +72,16 @@ public class JWTSecurityProvider implements SecurityProvider
 			DecodedJWT decodedToken = JWT.decode(tokenOptional.get());
 			String jwtId = decodedToken.getId();
 
+
 			String userId = decodedToken.getClaim("userId").asString();
+			String appName = decodedToken.getClaim("appName").asString();
 			String userName = decodedToken.getClaim("userName").asString();
 			String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
 
 
 			SecurityContext context =
 					new SecurityContext(AuthenticationType.JWT, jwtId, authenticationScheme, tokenOptional.get(),
-							userId, userName, userRoles);
+							appName, userId, userName, userRoles);
 			SecurityContextHolder.setContext(context);
 		}
 

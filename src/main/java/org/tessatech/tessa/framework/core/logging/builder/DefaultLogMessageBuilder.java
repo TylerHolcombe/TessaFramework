@@ -145,6 +145,7 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 		JsonObject user = new JsonObject();
 		addIfNotNull(user, "id", securityContext.getUserId());
+		addIfNotNull(user, "appName", securityContext.getAppName());
 		addIfNotNull(user, "username", securityContext.getUserName());
 		addSecurityRoles(user, securityContext);
 		security.add("user", user);

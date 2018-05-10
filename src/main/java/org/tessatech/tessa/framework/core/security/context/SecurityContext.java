@@ -22,18 +22,21 @@ public class SecurityContext
 	private final String authenticationId;
 	private final String authenticationScheme;
 	private final String authenticationToken;
+
 	private final String userId;
+	private final String appName;
 	private final String userName;
 	private final String[] userRoles;
 
 	public SecurityContext(AuthenticationType authenticationType, String authenticationId, String authenticationScheme,
-			String authenticationToken, String userId, String userName, String[] userRoles)
+			String authenticationToken, String userId, String appName, String userName, String[] userRoles)
 	{
 		this.authenticationType = authenticationType;
 		this.authenticationId = authenticationId;
 		this.authenticationScheme = authenticationScheme;
 		this.authenticationToken = authenticationToken;
 
+		this.appName = appName;
 		this.userId = userId;
 		this.userName = userName;
 		this.userRoles = userRoles;
@@ -62,6 +65,11 @@ public class SecurityContext
 	public String getUserId()
 	{
 		return userId;
+	}
+
+	public String getAppName()
+	{
+		return appName;
 	}
 
 	public String getUserName()

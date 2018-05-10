@@ -17,6 +17,7 @@
 package org.tessatech.tessa.framework.core.security.utils;
 
 import org.tessatech.tessa.framework.core.exception.logic.InsufficientAuthorizationException;
+import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtils;
 
@@ -35,13 +36,31 @@ public class SecurityUtils
 		}
 	}
 
-	public static void validateUserHasUsername(String username)
+	public static void validateUserId(String userId)
 	{
 		validateUserIsSignedIn();
 
+		InternalValidationUtils.getInstance().isNotTrimmedEmpty("userId", userId);
+
+		if(!userId.equals(SecurityContextHolder.getContext().getUserId()))
+		{
+			throw new InsufficientAuthorizationException("User has a different userId");
+		}
+	}
+
+	public static void validateUserHasUsername(String appName, String username)
+	{
+		validateUserIsSignedIn();
+
+		InternalValidationUtils.getInstance().isNotTrimmedEmpty("appName", appName);
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("username", username);
 
-		if(!SecurityContextHolder.getContext().getUserName().equals(username))
+		if(!appName.equals(SecurityContextHolder.getContext().getAppName()))
+		{
+			throw new InternalException("AppName in SecurityContext doesn't match the current app.");
+		}
+
+		if(!username.equals(SecurityContextHolder.getContext().getUserName()))
 		{
 			throw new InsufficientAuthorizationException("User has a different username.");
 		}
