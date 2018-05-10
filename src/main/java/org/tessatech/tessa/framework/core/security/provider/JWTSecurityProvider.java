@@ -38,6 +38,7 @@ import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtil
 import org.tessatech.tessa.framework.rest.request.TessaHttpHeaders;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Optional;
 
 @Component
@@ -59,6 +60,19 @@ public class JWTSecurityProvider implements SecurityProvider
 	private Algorithm previousAlgorithm;
 	private JWTVerifier previousVerifier;
 
+	public String createToken(String userId, String appName, String userName, String[] userRoles, Date expiresAt)
+	{
+		return JWT.create()
+				.withIssuer(jwtIssuer)
+				.withIssuedAt(new Date())
+				.withExpiresAt(expiresAt)
+				.withClaim("userId", userId)
+				.withClaim("appName", appName)
+				.withClaim("username", userName)
+				.withArrayClaim("userRoles", userRoles)
+				.sign(currentAlgorithm);
+	}
+
 	@Override
 	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity)
 			throws InvalidAuthenticationException
@@ -75,13 +89,13 @@ public class JWTSecurityProvider implements SecurityProvider
 
 			String userId = decodedToken.getClaim("userId").asString();
 			String appName = decodedToken.getClaim("appName").asString();
-			String userName = decodedToken.getClaim("userName").asString();
+			String username = decodedToken.getClaim("username").asString();
 			String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
 
 
 			SecurityContext context =
 					new SecurityContext(AuthenticationType.JWT, jwtId, authenticationScheme, tokenOptional.get(),
-							appName, userId, userName, userRoles);
+							appName, userId, username, userRoles);
 			SecurityContextHolder.setContext(context);
 		}
 
@@ -148,12 +162,7 @@ public class JWTSecurityProvider implements SecurityProvider
 		}
 	}
 
-	private boolean isTheOnlyRoleTheDefault(String[] validRoles)
-	{
-		return validRoles.length == 1 && validRoles[0] == SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
-	}
-
-	private Algorithm getAlgorithm(String secret)
+	private Algorithm createAlgorithm(String secret)
 	{
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("secret", secret);
 
@@ -168,7 +177,7 @@ public class JWTSecurityProvider implements SecurityProvider
 
 	}
 
-	private JWTVerifier getVerifier(Algorithm algorithm)
+	private JWTVerifier createVerifier(Algorithm algorithm)
 	{
 		InternalValidationUtils.getInstance().isNotTrimmedEmpty("jwtIssuer", jwtIssuer);
 
@@ -179,11 +188,11 @@ public class JWTSecurityProvider implements SecurityProvider
 	{
 		if(secret.previousSecret != null)
 		{
-			previousAlgorithm = getAlgorithm(secret.previousSecret);
-			previousVerifier = getVerifier(previousAlgorithm);
+			previousAlgorithm = createAlgorithm(secret.previousSecret);
+			previousVerifier = createVerifier(previousAlgorithm);
 		}
 
-		currentAlgorithm = getAlgorithm(secret.currentSecret);
-		currentVerifier = getVerifier(currentAlgorithm);
+		currentAlgorithm = createAlgorithm(secret.currentSecret);
+		currentVerifier = createVerifier(currentAlgorithm);
 	}
 }
