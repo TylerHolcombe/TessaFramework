@@ -18,14 +18,11 @@ package org.tessatech.tessa.framework.core.util.validation;
 
 import org.apache.logging.log4j.util.TriConsumer;
 import org.springframework.util.NumberUtils;
-import org.springframework.validation.ValidationUtils;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 abstract class AbstractValidationUtils
 {
@@ -33,31 +30,38 @@ abstract class AbstractValidationUtils
 
 	abstract RuntimeException generateExceptionForMessage(String message, Throwable cause);
 
-	public <U> void ifPresent(String fieldName, U fieldValue, BiConsumer<String, U> function)
+	public <U> AbstractValidationUtils ifPresent(String fieldName, U fieldValue, BiConsumer<String, U> function)
 	{
 		if(fieldValue != null)
 		{
 			function.accept(fieldName, fieldValue);
 		}
+
+		return this;
 	}
 
-	public <U, V> void ifPresent(String fieldName, U fieldValue, V testValue, TriConsumer<String, U, V> function)
+	public <U, V> AbstractValidationUtils ifPresent(String fieldName, U fieldValue, V testValue,
+			TriConsumer<String, U, V> function)
 	{
 		if(fieldValue != null)
 		{
 			function.accept(fieldName, fieldValue, testValue);
 		}
+
+		return this;
 	}
 
-	public void isNotNull(String fieldName, Object fieldValue)
+	public AbstractValidationUtils isNotNull(String fieldName, Object fieldValue)
 	{
 		if (fieldValue == null)
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was null.");
 		}
+
+		return this;
 	}
 
-	public void isNotEmpty(String fieldName, String fieldValue)
+	public AbstractValidationUtils isNotEmpty(String fieldName, String fieldValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -65,9 +69,11 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " is empty.");
 		}
+
+		return this;
 	}
 
-	public void isNotTrimmedEmpty(String fieldName, String fieldValue)
+	public AbstractValidationUtils isNotTrimmedEmpty(String fieldName, String fieldValue)
 	{
 		isNotEmpty(fieldName, fieldValue);
 
@@ -75,44 +81,56 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " is trimmed empty.");
 		}
+
+		return this;
 	}
 
-	public void isLengthGreaterThan(String fieldName, String fieldValue, int testValue)
+	public AbstractValidationUtils isLengthGreaterThan(String fieldName, String fieldValue, int testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
 		isGreaterThan(fieldName, fieldValue.length(), testValue);
+
+		return this;
 	}
 
-	public void isLengthGreaterThanOrEqualTo(String fieldName, String fieldValue, int testValue)
+	public AbstractValidationUtils isLengthGreaterThanOrEqualTo(String fieldName, String fieldValue, int testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
 		isGreaterThanOrEqualTo(fieldName, fieldValue.length(), testValue);
+
+		return this;
 	}
 
-	public void isLengthEqualTo(String fieldName, String fieldValue, int testValue)
+	public AbstractValidationUtils isLengthEqualTo(String fieldName, String fieldValue, int testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
 		isEqualTo(fieldName, fieldValue.length(), testValue);
+
+		return this;
 	}
 
-	public void isLengthLessThan(String fieldName, String fieldValue, int testValue)
+	public AbstractValidationUtils isLengthLessThan(String fieldName, String fieldValue, int testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
 		isLessThan(fieldName, fieldValue.length(), testValue);
+
+		return this;
 	}
 
-	public void isLengthLessThanOrEqualTo(String fieldName, String fieldValue, int testValue)
+	public AbstractValidationUtils isLengthLessThanOrEqualTo(String fieldName, String fieldValue, int testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
 		isLessThanOrEqualTo(fieldName, fieldValue.length(), testValue);
+
+		return this;
 	}
 
-	public <T extends Comparable<T>> void isGreaterThan(String fieldName, T fieldValue, T testValue)
+	public <T extends Comparable<T>> AbstractValidationUtils isGreaterThan(String fieldName, T fieldValue, T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -122,9 +140,11 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum value is greater than " + testValue);
 		}
+		return this;
 	}
 
-	public <T extends Comparable<T>> void isGreaterThanOrEqualTo(String fieldName, T fieldValue, T testValue)
+	public <T extends Comparable<T>> AbstractValidationUtils isGreaterThanOrEqualTo(String fieldName, T fieldValue,
+			T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -134,9 +154,10 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum is " + testValue);
 		}
+		return this;
 	}
 
-	public <T extends Comparable<T>> void isEqualTo(String fieldName, T fieldValue, T testValue)
+	public <T extends Comparable<T>> AbstractValidationUtils isEqualTo(String fieldName, T fieldValue, T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -146,9 +167,10 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The only acceptable value was " + testValue);
 		}
+		return this;
 	}
 
-	public <T extends Comparable<T>> void isLessThan(String fieldName, T fieldValue, T testValue)
+	public <T extends Comparable<T>> AbstractValidationUtils isLessThan(String fieldName, T fieldValue, T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -158,9 +180,11 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum value is less than " + testValue);
 		}
+		return this;
 	}
 
-	public <T extends Comparable<T>> void isLessThanOrEqualTo(String fieldName, T fieldValue, T testValue)
+	public <T extends Comparable<T>> AbstractValidationUtils isLessThanOrEqualTo(String fieldName, T fieldValue,
+			T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -170,9 +194,10 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum is: " + testValue);
 		}
+		return this;
 	}
 
-	public <T> void isInCollection(String fieldName, T fieldValue, Collection<T> testValues)
+	public <T> AbstractValidationUtils isInCollection(String fieldName, T fieldValue, Collection<T> testValues)
 	{
 		isNotNull(fieldName, fieldValue);
 
@@ -182,14 +207,37 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " did not contain an acceptable value. Acceptable values are: " + Arrays.toString(testValues.toArray()));
 		}
+		return this;
 	}
 
-	public <T> void isInArray(String fieldName, T fieldValue, T[] testValues)
+	public <T> AbstractValidationUtils isInArray(String fieldName, T fieldValue, T[] testValues)
 	{
 		isInCollection(fieldName, fieldValue, Arrays.asList(testValues));
+
+		return this;
 	}
 
-	public <T extends Number> T isParsable(String fieldName, String fieldValue, Class<T> numberClass)
+	public <T extends Number> AbstractValidationUtils isParsable(String fieldName, String fieldValue,
+			Class<T> numberClass)
+	{
+		isNotTrimmedEmpty(fieldName, fieldValue);
+
+		isTestValueValid(numberClass);
+
+		try
+		{
+			NumberUtils.parseNumber(fieldValue, numberClass);
+		}
+		catch (Exception e)
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + numberClass
+							.getSimpleName(),
+					e);
+		}
+		return this;
+	}
+
+	public <T extends Number> T parseNumber(String fieldName, String fieldValue, Class<T> numberClass)
 	{
 		isNotTrimmedEmpty(fieldName, fieldValue);
 
@@ -201,11 +249,32 @@ abstract class AbstractValidationUtils
 		}
 		catch (Exception e)
 		{
-			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + numberClass.getSimpleName(), e);
+			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + numberClass.getSimpleName
+					(), e);
 		}
 	}
 
-	public <T extends Enum<T>> T isInEnumeration(String fieldName, String fieldValue, Class<T> enumClass)
+	public <T extends Enum<T>> AbstractValidationUtils isInEnumeration(String fieldName, String fieldValue,
+			Class<T> enumClass)
+	{
+		isNotTrimmedEmpty(fieldName, fieldValue);
+
+		isTestValueValid(enumClass);
+
+		try
+		{
+			Enum.valueOf(enumClass, fieldValue.toUpperCase());
+		}
+		catch (Exception e)
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + enumClass.getSimpleName(),
+					e);
+		}
+
+		return this;
+	}
+
+	public <T extends Enum<T>> T parseEnumeration(String fieldName, String fieldValue, Class<T> enumClass)
 	{
 		isNotTrimmedEmpty(fieldName, fieldValue);
 
@@ -217,11 +286,12 @@ abstract class AbstractValidationUtils
 		}
 		catch (Exception e)
 		{
-			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + enumClass.getSimpleName(), e);
+			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + enumClass.getSimpleName(),
+					e);
 		}
 	}
 
-	public void isSanitized(String fieldName, String fieldValue, SanitizeRegex sanatizationRegex)
+	public AbstractValidationUtils isSanitized(String fieldName, String fieldValue, SanitizeRegex sanatizationRegex)
 	{
 		isNotTrimmedEmpty(fieldName, fieldValue);
 
@@ -229,9 +299,10 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
 		}
+		return this;
 	}
 
-	public void isSanitized(String fieldName, String fieldValue, String sanatizationRegex)
+	public AbstractValidationUtils isSanitized(String fieldName, String fieldValue, String sanatizationRegex)
 	{
 		isNotTrimmedEmpty(fieldName, fieldValue);
 
@@ -239,18 +310,21 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
 		}
+
+		return this;
 	}
 
-	public void isTestValueValid(Object testValue)
+	public AbstractValidationUtils isTestValueValid(Object testValue)
 	{
 		if (testValue == null)
 		{
 			throw new InternalException("Test value supplied to this validation is null.");
 		}
+		return this;
 	}
 
 
-	public void areTestValuesValid(Collection<?> testValues)
+	public AbstractValidationUtils areTestValuesValid(Collection<?> testValues)
 	{
 		isTestValueValid((Object) testValues);
 
@@ -263,6 +337,8 @@ abstract class AbstractValidationUtils
 		{
 			isTestValueValid(testValue);
 		}
+
+		return this;
 	}
 
 
