@@ -16,17 +16,38 @@
 
 package org.tessatech.tessa.framework.core.util.validation;
 
+import org.apache.logging.log4j.util.TriConsumer;
 import org.springframework.util.NumberUtils;
+import org.springframework.validation.ValidationUtils;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 abstract class AbstractValidationUtils
 {
 	abstract RuntimeException generateExceptionForMessage(String message);
 
 	abstract RuntimeException generateExceptionForMessage(String message, Throwable cause);
+
+	public <U> void ifPresent(String fieldName, U fieldValue, BiConsumer<String, U> function)
+	{
+		if(fieldValue != null)
+		{
+			function.accept(fieldName, fieldValue);
+		}
+	}
+
+	public <U, V> void ifPresent(String fieldName, U fieldValue, V testValue, TriConsumer<String, U, V> function)
+	{
+		if(fieldValue != null)
+		{
+			function.accept(fieldName, fieldValue, testValue);
+		}
+	}
 
 	public void isNotNull(String fieldName, Object fieldValue)
 	{
@@ -54,6 +75,41 @@ abstract class AbstractValidationUtils
 		{
 			throw generateExceptionForMessage("Field: " + fieldName + " is trimmed empty.");
 		}
+	}
+
+	public void isLengthGreaterThan(String fieldName, String fieldValue, int testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isGreaterThan(fieldName, fieldValue.length(), testValue);
+	}
+
+	public void isLengthGreaterThanOrEqualTo(String fieldName, String fieldValue, int testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isGreaterThanOrEqualTo(fieldName, fieldValue.length(), testValue);
+	}
+
+	public void isLengthEqualTo(String fieldName, String fieldValue, int testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isEqualTo(fieldName, fieldValue.length(), testValue);
+	}
+
+	public void isLengthLessThan(String fieldName, String fieldValue, int testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isLessThan(fieldName, fieldValue.length(), testValue);
+	}
+
+	public void isLengthLessThanOrEqualTo(String fieldName, String fieldValue, int testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isLessThanOrEqualTo(fieldName, fieldValue.length(), testValue);
 	}
 
 	public <T extends Comparable<T>> void isGreaterThan(String fieldName, T fieldValue, T testValue)
