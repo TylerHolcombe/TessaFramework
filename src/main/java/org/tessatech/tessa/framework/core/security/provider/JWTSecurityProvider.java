@@ -95,7 +95,7 @@ public class JWTSecurityProvider implements SecurityProvider
 
 			SecurityContext context =
 					new SecurityContext(AuthenticationType.JWT, jwtId, authenticationScheme, tokenOptional.get(),
-							appName, userId, username, userRoles);
+							userId, appName, username, userRoles);
 			SecurityContextHolder.setContext(context);
 		}
 
