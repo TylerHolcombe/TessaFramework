@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
-abstract class AbstractValidationUtils
+public abstract class AbstractValidationUtils
 {
 	abstract RuntimeException generateExceptionForMessage(String message);
 
