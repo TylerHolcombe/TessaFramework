@@ -220,20 +220,7 @@ abstract class AbstractValidationUtils
 	public <T extends Number> AbstractValidationUtils isParsable(String fieldName, String fieldValue,
 			Class<T> numberClass)
 	{
-		isNotTrimmedEmpty(fieldName, fieldValue);
-
-		isTestValueValid(numberClass);
-
-		try
-		{
-			NumberUtils.parseNumber(fieldValue, numberClass);
-		}
-		catch (Exception e)
-		{
-			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + numberClass
-							.getSimpleName(),
-					e);
-		}
+		parseNumber(fieldName, fieldValue, numberClass);
 		return this;
 	}
 
@@ -257,20 +244,7 @@ abstract class AbstractValidationUtils
 	public <T extends Enum<T>> AbstractValidationUtils isInEnumeration(String fieldName, String fieldValue,
 			Class<T> enumClass)
 	{
-		isNotTrimmedEmpty(fieldName, fieldValue);
-
-		isTestValueValid(enumClass);
-
-		try
-		{
-			Enum.valueOf(enumClass, fieldValue.toUpperCase());
-		}
-		catch (Exception e)
-		{
-			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + enumClass.getSimpleName(),
-					e);
-		}
-
+		parseEnumeration(fieldName, fieldValue, enumClass);
 		return this;
 	}
 

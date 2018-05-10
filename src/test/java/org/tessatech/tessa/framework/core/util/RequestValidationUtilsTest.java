@@ -220,7 +220,7 @@ public class RequestValidationUtilsTest
 	@Test
 	public void isParseable_True()
 	{
-		float result = util.isParsable("testField", "5.02", Float.class);
+		float result = util.parseNumber("testField", "5.02", Float.class);
 		assertEquals(5.02, result, 0.0001);
 	}
 
@@ -238,14 +238,14 @@ public class RequestValidationUtilsTest
 	@Test
 	public void isInEnumeration_True()
 	{
-		TestEnum val = util.isInEnumeration("TestField", "A", TestEnum.class);
+		TestEnum val = util.parseEnumeration("TestField", "A", TestEnum.class);
 		assertEquals(TestEnum.A, val);
 	}
 
 	@Test
 	public void isInEnumeration_Uppercases()
 	{
-		TestEnum val = util.isInEnumeration("TestField", "a", TestEnum.class);
+		TestEnum val = util.parseEnumeration("TestField", "a", TestEnum.class);
 		assertEquals(TestEnum.A, val);
 	}
 
