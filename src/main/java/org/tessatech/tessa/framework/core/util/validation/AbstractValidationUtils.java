@@ -217,6 +217,30 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
+	public AbstractValidationUtils isTrue(String fieldName, Boolean value)
+	{
+		isNotNull(fieldName, value);
+
+		if(!value.booleanValue())
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was false. Expected: true");
+		}
+
+		return this;
+	}
+
+	public AbstractValidationUtils isFalse(String fieldName, Boolean value)
+	{
+		isNotNull(fieldName, value);
+
+		if(value.booleanValue())
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was true. Expected: false");
+		}
+
+		return this;
+	}
+
 	public <T extends Number> AbstractValidationUtils isParsable(String fieldName, String fieldValue,
 			Class<T> numberClass)
 	{
