@@ -170,6 +170,19 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
+	public <T extends Comparable<T>> AbstractValidationUtils isNotEqualTo(String fieldName, T fieldValue, T testValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		isTestValueValid(testValue);
+
+		if (fieldValue.compareTo(testValue) == 0)
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The non-acceptable value was " + testValue);
+		}
+		return this;
+	}
+
 	public <T extends Comparable<T>> AbstractValidationUtils isLessThan(String fieldName, T fieldValue, T testValue)
 	{
 		isNotNull(fieldName, fieldValue);
