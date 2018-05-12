@@ -137,7 +137,7 @@ public class TokenService
 		return decodeToken(iamServiceClient.retrieveAuthenticationTokenForUserInContext());
 	}
 
-	void updateSecret(Secret secret)
+	public void updateSecret(Secret secret)
 	{
 		if (secret.previousSecret != null)
 		{
