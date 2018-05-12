@@ -22,7 +22,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
-import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.SecretAuthorization;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.SecretAuthentication;
 
 @Component
 public class IAMClientUtils
@@ -32,9 +32,9 @@ public class IAMClientUtils
 	@Value("${security.tessa.iam.secret.hmac.key}")
 	private String hmacKey;
 
-	public SecretAuthorization generateSecretAuthorization(String appName)
+	public SecretAuthentication generateSecretAuthorization(String appName)
 	{
-		SecretAuthorization request = new SecretAuthorization();
+		SecretAuthentication request = new SecretAuthentication();
 		request.appName = appName;
 		request.timestamp = System.currentTimeMillis();
 		request.nonce = RandomStringUtils.randomAlphanumeric(24);
@@ -42,7 +42,7 @@ public class IAMClientUtils
 		return request;
 	}
 
-	public String generateSignature(SecretAuthorization request)
+	public String generateSignature(SecretAuthentication request)
 	{
 		HmacUtils hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_512, hmacKey);
 		return hmac.hmacHex(request.appName + ":" + request.timestamp + ":" + request.nonce);

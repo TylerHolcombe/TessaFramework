@@ -19,8 +19,8 @@ package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.co
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "SecretAuthorization", description = "The fields necessary to retrieve the current current Secret.")
-public class SecretAuthorization
+@ApiModel(value = "SecretAuthentication", description = "The fields necessary to retrieve the current current Secret.")
+public class SecretAuthentication
 {
 	@ApiModelProperty(value = "The name of the requesting application.", required = true)
 	public String appName;
