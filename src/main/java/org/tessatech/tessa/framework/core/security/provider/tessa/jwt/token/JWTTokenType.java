@@ -14,21 +14,9 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.context;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.token;
 
-import org.tessatech.tessa.framework.core.security.token.SecurityToken;
-
-public class SecurityContext
+public enum JWTTokenType
 {
-	private final SecurityToken securityToken;
-
-	public SecurityContext(SecurityToken JWTToken)
-	{
-		this.securityToken = JWTToken;
-	}
-
-	public SecurityToken getSecurityToken()
-	{
-		return securityToken;
-	}
+	IDENTITY, AUTHORIZATION;
 }

@@ -16,19 +16,182 @@
 
 package org.tessatech.tessa.framework.core.security.utils;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.exception.logic.InsufficientAuthorizationException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
+import org.tessatech.tessa.framework.core.security.token.SecurityToken;
 import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class SecurityUtils
 {
-	public static final String DEFAULT_NO_AUTHORIZATION_REQUIRED = "DEFAULT_NO_AUTH_REQUIRED";
+	private static final InternalValidationUtils validationUtils = InternalValidationUtils.getInstance();
+	@Value("${security.tessa.iam.app.name}")
+	private String appName;
 
-	public static void validateUserIsSignedIn()
+	public SecurityUtils(String appName)
+	{
+		validationUtils.isNotTrimmedEmpty("AppName", appName);
+		this.appName = appName;
+	}
+
+	public boolean isUserSameAsUserInContext(String appName, String username)
+	{
+		validateUserIsSignedIntoApp();
+		return appName.equals(getThreadSecurityToken().getAppName())
+				&& username.equals(getThreadSecurityToken().getUsername());
+	}
+
+	public boolean isUserSameAsUserInContext(String userId)
+	{
+		validateUserIsSignedIntoApp();
+		return userId.equals(getThreadSecurityToken().getUserId());
+	}
+
+	public void validateUserIsSignedIntoApp()
+	{
+		validateSecurityContextHasCredentials();
+		validateAppIsSameAsContext();
+	}
+
+	public void validateUserHasUserId(String userId)
+	{
+		validateUserIsSignedIntoApp();
+
+		try
+		{
+			validationUtils.isEqualTo("UserId", userId, getThreadSecurityToken().getUserId());
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is signed in as a different user.", exception);
+		}
+	}
+
+	public void validateUserHasUsername(String username)
+	{
+		validateUserIsSignedIntoApp();
+
+		validationUtils.isNotTrimmedEmpty("username", username);
+
+		try
+		{
+			validationUtils.isEqualTo("Username", username, getThreadSecurityToken().getUsername());
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is signed in as a different user.", exception);
+		}
+	}
+
+	public void validateUserHasRole(String roleName)
+	{
+		validateUserIsSignedIntoApp();
+
+		validateUserHasAnyRole(new String[]{roleName});
+	}
+
+	public void validateUserHasAnyRole(String[] roles)
+	{
+		validateUserHasAnyRole(Arrays.asList(roles));
+	}
+
+	public void validateUserHasAnyRole(List<String> roles)
+	{
+		validateUserIsSignedIntoApp();
+
+		try
+		{
+			validationUtils.isAnyValueInCollection("Roles", Arrays.asList(getThreadSecurityToken().getRoles()), roles);
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for any of the necessary roles.",
+					exception);
+		}
+	}
+
+
+	public void validateUserHasAllRoles(String[] validRoles)
+	{
+		validateUserHasAllRoles(Arrays.asList(validRoles));
+	}
+
+	public void validateUserHasAllRoles(List<String> validRoles)
+	{
+		validateUserIsSignedIntoApp();
+
+		try
+		{
+			validationUtils.areAllValuesInCollection("Roles",
+					Arrays.asList(getThreadSecurityToken().getRoles()),
+					validRoles);
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for all of the necessary roles.",
+					exception);
+		}
+	}
+
+	public void validateUserHasEvent(String eventName)
+	{
+		validateUserIsSignedIntoApp();
+
+		validateUserHasAnyEvent(new String[]{eventName});
+	}
+
+	public void validateUserHasAnyEvent(String[] events)
+	{
+		validateUserHasAnyEvent(Arrays.asList(events));
+	}
+
+	public void validateUserHasAnyEvent(List<String> events)
+	{
+		validateUserIsSignedIntoApp();
+
+		try
+		{
+			validationUtils.isAnyValueInCollection("Roles",
+					Arrays.asList(getThreadSecurityToken().getEvents()),
+					events);
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for any of the necessary events.",
+					exception);
+		}
+	}
+
+
+	public void validateUserHasAllEvents(String[] validEvents)
+	{
+		validateUserHasAllEvents(Arrays.asList(validEvents));
+	}
+
+	public void validateUserHasAllEvents(List<String> validEvents)
+	{
+		validateUserIsSignedIntoApp();
+
+		try
+		{
+			validationUtils.areAllValuesInCollection("Roles",
+					Arrays.asList(getThreadSecurityToken().getEvents()),
+					validEvents);
+		}
+		catch (InternalException exception)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for all of the necessary events.",
+					exception);
+		}
+	}
+
+	private void validateSecurityContextHasCredentials()
 	{
 		if (!SecurityContextHolder.getContextOptional().isPresent())
 		{
@@ -36,116 +199,20 @@ public class SecurityUtils
 		}
 	}
 
-	public static void validateUserId(String userId)
+	private void validateAppIsSameAsContext()
 	{
-		validateUserIsSignedIn();
-
-		InternalValidationUtils.getInstance().isNotTrimmedEmpty("userId", userId);
-
-		if(!userId.equals(SecurityContextHolder.getContext().getUserId()))
-		{
-			throw new InsufficientAuthorizationException("User has a different userId");
-		}
-	}
-
-	public static void validateUserHasUsername(String appName, String username)
-	{
-		validateUserIsSignedIn();
-
-		InternalValidationUtils.getInstance().isNotTrimmedEmpty("appName", appName);
-		InternalValidationUtils.getInstance().isNotTrimmedEmpty("username", username);
-
-		if(!appName.equals(SecurityContextHolder.getContext().getAppName()))
-		{
-			throw new InternalException("AppName in SecurityContext doesn't match the current app.");
-		}
-
-		if(!username.equals(SecurityContextHolder.getContext().getUserName()))
-		{
-			throw new InsufficientAuthorizationException("User has a different username.");
-		}
-	}
-
-	public static void validateUserHasRole(String roleName)
-	{
-		validateUserIsSignedIn();
-
-		validateUserHasRoleInternal(roleName);
-	}
-
-	public static void validateUserHasAllRoles(String[] validRoles)
-	{
-		validateUserHasAllRoles(Arrays.asList(validRoles));
-	}
-
-	public static void validateUserHasAllRoles(List<String> validRoles)
-	{
-		validateUserIsSignedIn();
-
-		for (String role : validRoles)
-		{
-			validateUserHasRoleInternal(role);
-		}
-	}
-
-	public static void validateUserHasAnyRole(String[] roles)
-	{
-		validateUserHasAnyRole(Arrays.asList(roles));
-	}
-
-	public static void validateUserHasAnyRole(List<String> roles)
-	{
-		validateUserIsSignedIn();
-
-		InternalValidationUtils.getInstance().areTestValuesValid(roles);
-
-		String[] userRoles = SecurityContextHolder.getContextOptional().get().getUserRoles();
-
-		InternalValidationUtils.getInstance().areTestValuesValid(Arrays.asList(userRoles));
-
-		for (String userRole : userRoles)
-		{
-			if (roles.contains(userRole))
-			{
-				return;
-			}
-		}
-
-		throw new InsufficientAuthorizationException("User is not authorized for any of the valid roles.");
-	}
-
-	private static void validateUserHasRoleInternal(String role)
-	{
-		String[] userRoles = SecurityContextHolder.getContextOptional().get().getUserRoles();
-
 		try
 		{
-			InternalValidationUtils.getInstance().isInArray("RoleName", role, userRoles);
+			validationUtils.isEqualTo("AppName", appName, getThreadSecurityToken().getAppName());
 		}
-		catch (InternalError e)
+		catch (InternalException exception)
 		{
-			throw new InsufficientAuthorizationException("User is not authorized for role: " + role, e);
+			throw new InsufficientAuthorizationException("User is not signed into this application.", exception);
 		}
 	}
 
-	public static boolean containsOnlyTheDefaultRole(String[] roles)
+	private SecurityToken getThreadSecurityToken()
 	{
-		return roles != null && roles.length == 1 && DEFAULT_NO_AUTHORIZATION_REQUIRED.equals(roles[0]);
-	}
-
-	public static boolean containsNonDefaultRoles(String[] roles)
-	{
-		return roles != null && roles.length > 0 && !containsOnlyTheDefaultRole(roles);
-	}
-
-	public static List<String> removeDefaultRole(String[] roles)
-	{
-		return removeDefaultRole(Arrays.asList(roles));
-	}
-
-	public static List<String> removeDefaultRole(List<String> roles)
-	{
-		roles.remove(DEFAULT_NO_AUTHORIZATION_REQUIRED);
-		return roles;
+		return SecurityContextHolder.getContext().getSecurityToken();
 	}
 }

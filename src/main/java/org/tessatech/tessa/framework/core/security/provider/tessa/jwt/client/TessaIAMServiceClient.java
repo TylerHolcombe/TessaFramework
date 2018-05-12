@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.client;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,25 +22,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.tessatech.tessa.framework.core.event.TessaEvent;
-import org.tessatech.tessa.framework.core.security.client.container.Secret;
-import org.tessatech.tessa.framework.core.security.client.utils.SecretRequestUtils;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.Secret;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.Token;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.utils.IAMClientUtils;
+import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 import org.tessatech.tessa.framework.rest.client.TessaRestClient;
 
 import java.util.Optional;
 
 @Component
-public class IAMServiceClient
+public class TessaIAMServiceClient
 {
-	private static final Logger logger = LogManager.getLogger(IAMServiceClient.class);
+	private static final Logger logger = LogManager.getLogger(TessaIAMServiceClient.class);
 
 	@Autowired
-	private SecretRequestUtils secretRequestUtils;
+	private IAMClientUtils IAMClientUtils;
 
 	@Value("${security.tessa.iam.app.name}")
 	private String appName;
 
-	@Value("${security.tessa.iam.endpoint.url}")
-	private String endpointUrl;
+	@Value("${security.tessa.iam.secret.endpoint.url}")
+	private String secretEndpointUrl;
+
+	@Value("${security.tessa.iam.token.endpoint.url}")
+	private String tokenEndpointUrl;
 
 	private TessaRestClient client = new TessaRestClient("IAM Service");
 
@@ -50,7 +55,10 @@ public class IAMServiceClient
 		try
 		{
 			return Optional.of(client
-					.post("/secret", endpointUrl, secretRequestUtils.generateSecretRequest(appName), Secret.class));
+					.post("/secret",
+							secretEndpointUrl,
+							IAMClientUtils.generateSecretAuthorization(appName),
+							Secret.class));
 		}
 		catch (Exception e)
 		{
@@ -58,6 +66,15 @@ public class IAMServiceClient
 		}
 
 		return Optional.empty();
+	}
+
+	public String retrieveAuthenticationTokenForUserInContext()
+	{
+		SecurityUtils.validateUserIsSignedIntoApp();
+
+		Token authToken = client.get("/token/authorization", tokenEndpointUrl, Token.class);
+
+		return authToken.token;
 	}
 
 }

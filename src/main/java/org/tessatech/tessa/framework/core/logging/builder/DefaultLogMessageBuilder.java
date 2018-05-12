@@ -33,6 +33,8 @@ import org.tessatech.tessa.framework.core.logging.export.LogDataExporter;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributes;
 import org.tessatech.tessa.framework.core.security.context.SecurityContext;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.token.JWTToken;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.token.JWTTokenType;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContext;
 import org.tessatech.tessa.framework.core.transaction.context.TransactionContextHolder;
 import org.tessatech.tessa.framework.rest.exception.adapter.RestThrowableAdapter;
@@ -139,16 +141,27 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		JsonObject security = new JsonObject();
 
 		JsonObject auth = new JsonObject();
-		addIfNotNull(auth, "type", securityContext.getAuthenticationType());
-		addIfNotNull(auth, "id", securityContext.getAuthenticationId());
+		addIfNotNull(auth, "type", securityContext.getSecurityToken().getClass().getSimpleName());
+		addIfNotNull(auth, "id", securityContext.getSecurityToken().getTokenId());
 		security.add("auth", auth);
 
 		JsonObject user = new JsonObject();
-		addIfNotNull(user, "id", securityContext.getUserId());
-		addIfNotNull(user, "appName", securityContext.getAppName());
-		addIfNotNull(user, "username", securityContext.getUserName());
-		addSecurityRoles(user, securityContext);
+		addIfNotNull(user, "id", securityContext.getSecurityToken().getUserId());
+		addIfNotNull(user, "appName", securityContext.getSecurityToken().getAppName());
+		addIfNotNull(user, "username", securityContext.getSecurityToken().getUsername());
 		security.add("user", user);
+
+
+		if(securityContext.getSecurityToken() instanceof JWTToken)
+		{
+			JWTToken token = (JWTToken) securityContext.getSecurityToken();
+			addIfNotNull(auth, "jwtTokenType", token.getTokenType());
+			if(token.getTokenType().equals(JWTTokenType.AUTHORIZATION))
+			{
+				addSecurityRoles(user, securityContext);
+				addSecurityEvents(user, securityContext);
+			}
+		}
 
 		logMessage.add("security", security);
 
@@ -157,14 +170,27 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 	private void addSecurityRoles(JsonObject user, SecurityContext securityContext)
 	{
-		if (securityContext.getUserRoles() != null)
+		if (securityContext.getSecurityToken().getRoles() != null)
 		{
 			JsonArray rolesArray = new JsonArray();
-			for (int i = 0; i < 3 && i < securityContext.getUserRoles().length; i++)
+			for (int i = 0; i < 3 && i < securityContext.getSecurityToken().getRoles().length; i++)
 			{
-				rolesArray.add(securityContext.getUserRoles()[i].toString());
+				rolesArray.add(securityContext.getSecurityToken().getRoles()[i].toString());
 			}
 			user.add("roles", rolesArray);
+		}
+	}
+
+	private void addSecurityEvents(JsonObject user, SecurityContext securityContext)
+	{
+		if (securityContext.getSecurityToken().getEvents() != null)
+		{
+			JsonArray rolesArray = new JsonArray();
+			for (int i = 0; i < 3 && i < securityContext.getSecurityToken().getEvents().length; i++)
+			{
+				rolesArray.add(securityContext.getSecurityToken().getEvents()[i].toString());
+			}
+			user.add("events", rolesArray);
 		}
 	}
 

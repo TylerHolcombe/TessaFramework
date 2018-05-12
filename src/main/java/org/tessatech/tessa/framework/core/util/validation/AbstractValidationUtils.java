@@ -217,6 +217,75 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
+	public AbstractValidationUtils isNotEmpty(String fieldName, Collection<?> fieldValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		if(fieldValue.isEmpty())
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was empty.");
+		}
+
+		return this;
+	}
+
+	public <T> AbstractValidationUtils isNotEmpty(String fieldName, T[] fieldValue)
+	{
+		isNotNull(fieldName, fieldValue);
+
+		if(fieldValue.length == 0)
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " was empty.");
+		}
+
+		return this;
+	}
+
+	public <T> AbstractValidationUtils areAllValuesInCollection(String fieldName, Collection<T> fieldValue, Collection<T> allValuesToMatch)
+	{
+		isNotEmpty(fieldName, fieldValue);
+
+		areTestValuesValid(allValuesToMatch);
+
+		if(!allValuesToMatch.containsAll(fieldValue))
+		{
+			throw generateExceptionForMessage("Field: " + fieldName + " did not contain all the required values. Required values are: " + Arrays.toString(allValuesToMatch.toArray()));
+		}
+		return this;
+	}
+
+	public <T> AbstractValidationUtils areAllValuesInArray(String fieldName, T[] fieldValue, T[] allValuesToMatch)
+	{
+		areAllValuesInCollection(fieldName, Arrays.asList(fieldValue), Arrays.asList(allValuesToMatch));
+
+		return this;
+	}
+
+	public <T> AbstractValidationUtils isAnyValueInCollection(String fieldName, Collection<T> fieldValue, Collection<T> anyValueToMatch)
+	{
+		isNotEmpty(fieldName, fieldValue);
+
+		areTestValuesValid(anyValueToMatch);
+
+		for(T value : fieldValue)
+		{
+			if(anyValueToMatch.contains(value))
+			{
+				return this;
+			}
+		}
+
+		throw generateExceptionForMessage("Field: " + fieldName + " did not contain any of the required values. Required values are: " + Arrays.toString(anyValueToMatch.toArray()));
+
+	}
+
+	public <T> AbstractValidationUtils isAnyValueInArray(String fieldName, T[] fieldValue, T[] anyValueToMatch)
+	{
+		isAnyValueInCollection(fieldName, Arrays.asList(fieldValue), Arrays.asList(anyValueToMatch));
+
+		return this;
+	}
+
 	public AbstractValidationUtils isTrue(String fieldName, Boolean value)
 	{
 		isNotNull(fieldName, value);

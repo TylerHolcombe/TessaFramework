@@ -14,18 +14,18 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.client.container;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "SecretRequest", description = "The fields necessary to retrieve the current currentSecret.")
-public class SecretRequest
+@ApiModel(value = "SecretAuthorization", description = "The fields necessary to retrieve the current current Secret.")
+public class SecretAuthorization
 {
 	@ApiModelProperty(value = "The name of the requesting application.", required = true)
 	public String appName;
 
-	@ApiModelProperty(value = "The epoch timestamp in milliseconds of the request to retrieve the current currentSecret.", required = true)
+	@ApiModelProperty(value = "The epoch timestamp in milliseconds of the request to retrieve the current current Secret.", required = true)
 	public long timestamp;
 
 	@ApiModelProperty(value = "A 24 character nonce used to generate this request.", required = true)

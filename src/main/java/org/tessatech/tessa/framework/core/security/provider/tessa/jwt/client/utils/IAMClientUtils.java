@@ -14,24 +14,27 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.client.utils;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.utils;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.core.security.client.container.SecretRequest;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.SecretAuthorization;
 
 @Component
-public class SecretRequestUtils
+public class IAMClientUtils
 {
-	@Value("${security.tessa.iam.hmac.key}")
+	private static TessaIAMServiceClient tessaIamServiceClient;
+
+	@Value("${security.tessa.iam.secret.hmac.key}")
 	private String hmacKey;
 
-	public SecretRequest generateSecretRequest(String appName)
+	public SecretAuthorization generateSecretAuthorization(String appName)
 	{
-		SecretRequest request = new SecretRequest();
+		SecretAuthorization request = new SecretAuthorization();
 		request.appName = appName;
 		request.timestamp = System.currentTimeMillis();
 		request.nonce = RandomStringUtils.randomAlphanumeric(24);
@@ -39,7 +42,7 @@ public class SecretRequestUtils
 		return request;
 	}
 
-	public String generateSignature(SecretRequest request)
+	public String generateSignature(SecretAuthorization request)
 	{
 		HmacUtils hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_512, hmacKey);
 		return hmac.hmacHex(request.appName + ":" + request.timestamp + ":" + request.nonce);

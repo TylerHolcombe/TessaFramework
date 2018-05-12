@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.client.container;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

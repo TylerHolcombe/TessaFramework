@@ -24,6 +24,6 @@ import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationE
 public interface SecurityProvider
 {
 
-	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity) throws InvalidAuthenticationException;
+	void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity) throws InvalidAuthenticationException;
 
 }

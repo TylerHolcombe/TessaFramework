@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.tessatech.tessa.framework.core.security.provider.JWTSecurityProvider;
 
 import java.net.URI;
 

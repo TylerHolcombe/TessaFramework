@@ -68,7 +68,7 @@ public class RestUtils
 		SecurityContext context = SecurityContextHolder.getContext();
 
 		//TODO This needs to be moved into a service/util, not hacked in here.
-		String token = context.getAuthenticationScheme() + " " + context.getAuthenticationToken();
+		String token = "Bearer " + context.getSecurityToken().getRawToken();
 		headers.setAuthorization(token);
 
 		return  addClientTraceDetailsToHeaders(headers);

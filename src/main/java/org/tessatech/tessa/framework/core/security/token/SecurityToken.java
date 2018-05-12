@@ -14,21 +14,21 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.context;
+package org.tessatech.tessa.framework.core.security.token;
 
-import org.tessatech.tessa.framework.core.security.token.SecurityToken;
-
-public class SecurityContext
+public interface SecurityToken
 {
-	private final SecurityToken securityToken;
+	String getTokenId();
 
-	public SecurityContext(SecurityToken JWTToken)
-	{
-		this.securityToken = JWTToken;
-	}
+	String getRawToken();
 
-	public SecurityToken getSecurityToken()
-	{
-		return securityToken;
-	}
+	String getAppName();
+
+	String getUserId();
+
+	String getUsername();
+
+	String[] getRoles();
+
+	String[] getEvents();
 }

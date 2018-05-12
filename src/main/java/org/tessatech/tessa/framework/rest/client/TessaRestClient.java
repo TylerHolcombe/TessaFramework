@@ -49,7 +49,7 @@ public class TessaRestClient extends AbstractRestClient<TessaErrorResponse>
 		return super.execute(methodName, request, url, HttpMethod.POST, responseClass);
 	}
 
-	public <Request, SuccessfulResponse> SuccessfulResponse get(String methodName, String url, Request request,
+	public <Request, SuccessfulResponse> SuccessfulResponse get(String methodName, String url,
 			Class<SuccessfulResponse> responseClass)
 	{
 		return super.execute(methodName, null, url, HttpMethod.GET, responseClass);

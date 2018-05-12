@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.provider;
+package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,27 +22,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.core.event.TessaEvent;
-import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
-import org.tessatech.tessa.framework.core.security.client.container.Secret;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.Secret;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Optional;
 
 @Component
-public class JWTSecretScheduler implements Runnable
+public class TokenScheduler implements Runnable
 {
-	private static final Logger logger = LogManager.getLogger(JWTSecretScheduler.class);
+	private static final Logger logger = LogManager.getLogger(TokenScheduler.class);
 
 	@Autowired
 	private TaskScheduler scheduler;
 
 	@Autowired
-	private IAMServiceClient iamServiceClient;
+	private TessaIAMServiceClient tessaIamServiceClient;
 
 	@Autowired
-	private JWTSecurityProvider securityProvider;
+	private TokenService securityProvider;
 
 	@Value("${security.jwt.enabled:true}")
 	private boolean isJwtEnabled = true;
@@ -57,7 +56,7 @@ public class JWTSecretScheduler implements Runnable
 			return;
 		}
 
-		Optional<Secret> optionalSecret = iamServiceClient.retrieveLatestSecret();
+		Optional<Secret> optionalSecret = tessaIamServiceClient.retrieveLatestSecret();
 
 		optionalSecret = retryIfFirstCallFailed(optionalSecret);
 
@@ -80,7 +79,7 @@ public class JWTSecretScheduler implements Runnable
 	{
 		if(!optionalSecret.isPresent())
 		{
-			optionalSecret = iamServiceClient.retrieveLatestSecret();
+			optionalSecret = tessaIamServiceClient.retrieveLatestSecret();
 		}
 		return optionalSecret;
 	}

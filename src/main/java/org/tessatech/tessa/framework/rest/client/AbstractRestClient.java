@@ -31,13 +31,13 @@ import org.springframework.web.client.RestTemplate;
 import org.tessatech.tessa.framework.core.exception.system.ExternalException;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
-import org.tessatech.tessa.framework.core.security.client.IAMServiceClient;
+import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
 
 import java.net.URI;
 
 public abstract class AbstractRestClient<ErrorResponse>
 {
-	private static final Logger logger = LogManager.getLogger(IAMServiceClient.class);
+	private static final Logger logger = LogManager.getLogger(TessaIAMServiceClient.class);
 	private static final Gson gson = new Gson();
 
 	private String systemName;

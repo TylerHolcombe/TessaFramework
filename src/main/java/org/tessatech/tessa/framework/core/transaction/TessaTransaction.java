@@ -33,6 +33,4 @@ public @interface TessaTransaction
 	String serviceOperation() default "";
 	String serviceVersion() default "";
 	String serviceMethodName();
-
-	String[] authorizedRoles() default SecurityUtils.DEFAULT_NO_AUTHORIZATION_REQUIRED;
 }
