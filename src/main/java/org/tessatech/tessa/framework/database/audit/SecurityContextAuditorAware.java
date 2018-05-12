@@ -33,7 +33,7 @@ public class SecurityContextAuditorAware implements AuditorAware<String>
 
 		if (SecurityContextHolder.getContextOptional().isPresent())
 		{
-			auditor = SecurityContextHolder.getContext().getUserId();
+			auditor = SecurityContextHolder.getContext().getSecurityToken().getUserId();
 		}
 
 		return Optional.ofNullable(auditor);

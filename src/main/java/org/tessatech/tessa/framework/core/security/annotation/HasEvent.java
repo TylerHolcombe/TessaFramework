@@ -14,17 +14,16 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.utils.annotation;
+package org.tessatech.tessa.framework.core.security.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HasAllRoles
+public @interface HasEvent
 {
-	String[] authorizedRoles();
+	String requiredEvent();
 }

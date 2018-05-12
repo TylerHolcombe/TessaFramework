@@ -14,7 +14,7 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.utils.annotation;
+package org.tessatech.tessa.framework.core.security.annotation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +24,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 import org.tessatech.tessa.framework.core.security.utils.SecurityUtils;
 
 @Aspect
@@ -44,14 +43,14 @@ public class SecurityAspect
 	@Around("anyPublicMethod() && @annotation(hasAllRoles)")
 	public Object hasAllRoles(ProceedingJoinPoint proceedingJoinPoint, HasAllRoles hasAllRoles) throws Throwable
 	{
-		securityUtils.validateUserHasAllRoles(hasAllRoles.authorizedRoles());
+		securityUtils.validateUserHasAllRoles(hasAllRoles.requiredRoles());
 		return proceedingJoinPoint.proceed();
 	}
 
 	@Around("anyPublicMethod() && @annotation(hasRole)")
 	public Object hasRole(ProceedingJoinPoint proceedingJoinPoint, HasRole hasRole) throws Throwable
 	{
-		securityUtils.validateUserHasRole(hasRole.authorizedRole());
+		securityUtils.validateUserHasRole(hasRole.requiredRole());
 		return proceedingJoinPoint.proceed();
 	}
 
@@ -59,6 +58,34 @@ public class SecurityAspect
 	public Object hasAnyRole(ProceedingJoinPoint proceedingJoinPoint, HasAnyRole hasAnyRole) throws Throwable
 	{
 		securityUtils.validateUserHasAnyRole(hasAnyRole.authorizedRoles());
+		return proceedingJoinPoint.proceed();
+	}
+
+	@Around("anyPublicMethod() && @annotation(hasAllEvents)")
+	public Object hasAllEvents(ProceedingJoinPoint proceedingJoinPoint, HasAllEvents hasAllEvents) throws Throwable
+	{
+		securityUtils.validateUserHasAllEvents(hasAllEvents.requiredEvents());
+		return proceedingJoinPoint.proceed();
+	}
+
+	@Around("anyPublicMethod() && @annotation(hasEvent)")
+	public Object hasEvent(ProceedingJoinPoint proceedingJoinPoint, HasEvent hasEvent) throws Throwable
+	{
+		securityUtils.validateUserHasEvent(hasEvent.requiredEvent());
+		return proceedingJoinPoint.proceed();
+	}
+
+	@Around("anyPublicMethod() && @annotation(hasAnyEvent)")
+	public Object hasAnyEvent(ProceedingJoinPoint proceedingJoinPoint, HasAnyEvent hasAnyEvent) throws Throwable
+	{
+		securityUtils.validateUserHasAnyEvent(hasAnyEvent.authorizedEvents());
+		return proceedingJoinPoint.proceed();
+	}
+
+	@Around("anyPublicMethod() && @annotation(isSignedIn)")
+	public Object isSignedIn(ProceedingJoinPoint proceedingJoinPoint, IsSignedIn isSignedIn) throws Throwable
+	{
+		securityUtils.validateUserIsSignedIntoApp();
 		return proceedingJoinPoint.proceed();
 	}
 }

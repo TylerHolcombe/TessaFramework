@@ -31,8 +31,14 @@ import java.util.List;
 public class SecurityUtils
 {
 	private static final InternalValidationUtils validationUtils = InternalValidationUtils.getInstance();
+
 	@Value("${security.tessa.iam.app.name}")
 	private String appName;
+
+	SecurityUtils()
+	{
+
+	}
 
 	public SecurityUtils(String appName)
 	{

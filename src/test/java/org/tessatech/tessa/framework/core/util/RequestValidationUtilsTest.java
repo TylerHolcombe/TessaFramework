@@ -67,7 +67,8 @@ public class RequestValidationUtilsTest
 	@Test(expected = ValidationException.class)
 	public void isNotEmpty_Null()
 	{
-		util.isNotEmpty("TestField", null);
+		String testValue = null;
+		util.isNotEmpty("TestField", testValue);
 	}
 
 	@Test

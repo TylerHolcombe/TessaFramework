@@ -38,6 +38,9 @@ public class TessaIAMServiceClient
 	@Autowired
 	private IAMClientUtils IAMClientUtils;
 
+	@Autowired
+	private SecurityUtils securityUtils;
+
 	@Value("${security.tessa.iam.app.name}")
 	private String appName;
 
@@ -70,7 +73,7 @@ public class TessaIAMServiceClient
 
 	public String retrieveAuthenticationTokenForUserInContext()
 	{
-		SecurityUtils.validateUserIsSignedIntoApp();
+		securityUtils.validateUserIsSignedIntoApp();
 
 		Token authToken = client.get("/token/authorization", tokenEndpointUrl, Token.class);
 

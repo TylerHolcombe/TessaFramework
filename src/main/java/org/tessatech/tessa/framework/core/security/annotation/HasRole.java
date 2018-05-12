@@ -14,16 +14,16 @@
  *
  */
 
-package org.tessatech.tessa.framework.core.security.provider;
+package org.tessatech.tessa.framework.core.security.annotation;
 
-import org.springframework.http.RequestEntity;
-import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
-import org.tessatech.tessa.framework.core.exception.logic.InsufficientAuthorizationException;
-import org.tessatech.tessa.framework.core.exception.logic.InvalidAuthenticationException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface SecurityProvider
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HasRole
 {
-
-	void loadAndVerifySecurityDetails(RequestEntity requestEntity) throws InvalidAuthenticationException;
-
+	String requiredRole();
 }

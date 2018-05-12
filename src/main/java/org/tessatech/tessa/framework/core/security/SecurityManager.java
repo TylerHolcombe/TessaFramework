@@ -42,7 +42,7 @@ public class SecurityManager
 
 		if (securityEnabled)
 		{
-			securityProvider.loadAndVerifySecurityDetails(transaction.authorizedRoles(), request);
+			securityProvider.loadAndVerifySecurityDetails(request);
 		}
 
 	}

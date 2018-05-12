@@ -229,7 +229,7 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
-	public <T> AbstractValidationUtils isNotEmpty(String fieldName, T[] fieldValue)
+	public AbstractValidationUtils isNotEmpty(String fieldName, Object[] fieldValue)
 	{
 		isNotNull(fieldName, fieldValue);
 

@@ -44,7 +44,7 @@ public class TessaJWTSecurityProvider implements SecurityProvider
 	private TokenService tokenService;
 
 	@Override
-	public void loadAndVerifySecurityDetails(String[] validRoles, RequestEntity requestEntity)
+	public void loadAndVerifySecurityDetails(RequestEntity requestEntity)
 			throws InvalidAuthenticationException
 	{
 		Optional<String> rawTokenOptional = retrieveAndValidateToken(requestEntity);
