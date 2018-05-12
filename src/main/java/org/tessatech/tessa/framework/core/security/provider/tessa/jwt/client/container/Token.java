@@ -37,7 +37,7 @@ public class Token
 	@ApiModelProperty(value = "The time-to-live (TTL) of the token in milliseconds.")
 	public Date expires;
 
-	@ApiModelProperty(value = "The type of token.", allowableValues = "Identity,Authorization")
+	@ApiModelProperty(value = "The type of token.", allowableValues = "IDENTITY,AUTHORIZATION")
 	public String type;
 
 }

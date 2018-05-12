@@ -116,7 +116,7 @@ public class TokenService
 		{
 			currentVerifier.verify(token);
 		}
-		catch (JWTVerificationException currentVerifierException)
+		catch (JWTVerificationException | NullPointerException currentVerifierException)
 		{
 			//Perhaps the token is old, try again with previous verifier.
 
@@ -124,7 +124,7 @@ public class TokenService
 			{
 				previousVerifier.verify(token);
 			}
-			catch (JWTVerificationException previousVerifierException)
+			catch (JWTVerificationException | NullPointerException exception)
 			{
 				throw new InvalidAuthenticationException("Could not verify JWT token", currentVerifierException);
 			}
