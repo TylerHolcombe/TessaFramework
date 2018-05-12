@@ -85,7 +85,7 @@ public class SecurityAspect
 	@Around("anyPublicMethod() && @annotation(isSignedIn)")
 	public Object isSignedIn(ProceedingJoinPoint proceedingJoinPoint, IsSignedIn isSignedIn) throws Throwable
 	{
-		securityUtils.validateUserIsSignedIntoApp();
+		securityUtils.validateUserIsSignedIn();
 		return proceedingJoinPoint.proceed();
 	}
 }

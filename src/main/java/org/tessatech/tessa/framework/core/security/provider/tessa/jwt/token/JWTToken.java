@@ -154,7 +154,7 @@ public class JWTToken implements SecurityToken
 		convertToAuthToken();
 		return events;
 	}
-	
+
 	private void convertToAuthToken()
 	{
 		if (!JWTTokenType.AUTHORIZATION.equals(this.tokenType))

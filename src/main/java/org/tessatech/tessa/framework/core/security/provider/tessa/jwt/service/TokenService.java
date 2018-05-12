@@ -90,21 +90,24 @@ public class TokenService
 		DecodedJWT decodedToken = JWT.decode(token);
 		String jwtId = decodedToken.getId();
 
-
+		String typeString = decodedToken.getClaim("type").asString();
+		JWTTokenType type = InternalValidationUtils.getInstance().parseEnumeration("TokenType", typeString, JWTTokenType.class);
 		String userId = decodedToken.getClaim("userId").asString();
 		String appName = decodedToken.getClaim("appName").asString();
 		String username = decodedToken.getClaim("username").asString();
 		String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
 		String[] userEvents = decodedToken.getClaim("userRoles").asArray(String.class);
 
-		if ((userRoles != null && userRoles.length > 0) || (userEvents != null && userEvents.length > 0))
+		if (type.equals(JWTTokenType.AUTHORIZATION))
 		{
 			return JWTToken.createAuthorizationToken(this, appName, userId, username, userRoles, userEvents, jwtId, token);
 		}
-		else
+		else if (type.equals(JWTTokenType.IDENTITY))
 		{
 			return JWTToken.createIdentityToken(this, appName, userId, username, jwtId, token);
 		}
+
+		throw new InternalException("Unsupported Token Type: " + type);
 	}
 
 	public void verifyToken(String token)

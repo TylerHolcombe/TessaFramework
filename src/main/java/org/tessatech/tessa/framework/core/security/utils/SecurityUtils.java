@@ -46,17 +46,22 @@ public class SecurityUtils
 		this.appName = appName;
 	}
 
-	public boolean isUserSameAsUserInContext(String appName, String username)
+	public static boolean isUserSameAsUserInContext(String appName, String username)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 		return appName.equals(getThreadSecurityToken().getAppName())
 				&& username.equals(getThreadSecurityToken().getUsername());
 	}
 
-	public boolean isUserSameAsUserInContext(String userId)
+	public static boolean isUserSameAsUserInContext(String userId)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 		return userId.equals(getThreadSecurityToken().getUserId());
+	}
+
+	public static void validateUserIsSignedIn()
+	{
+		validateSecurityContextHasCredentials();
 	}
 
 	public void validateUserIsSignedIntoApp()
@@ -65,9 +70,9 @@ public class SecurityUtils
 		validateAppIsSameAsContext();
 	}
 
-	public void validateUserHasUserId(String userId)
+	public static void validateUserHasUserId(String userId)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		try
 		{
@@ -95,21 +100,21 @@ public class SecurityUtils
 		}
 	}
 
-	public void validateUserHasRole(String roleName)
+	public static void validateUserHasRole(String roleName)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		validateUserHasAnyRole(new String[]{roleName});
 	}
 
-	public void validateUserHasAnyRole(String[] roles)
+	public static void validateUserHasAnyRole(String[] roles)
 	{
 		validateUserHasAnyRole(Arrays.asList(roles));
 	}
 
-	public void validateUserHasAnyRole(List<String> roles)
+	public static void validateUserHasAnyRole(List<String> roles)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		try
 		{
@@ -123,14 +128,14 @@ public class SecurityUtils
 	}
 
 
-	public void validateUserHasAllRoles(String[] validRoles)
+	public static void validateUserHasAllRoles(String[] validRoles)
 	{
 		validateUserHasAllRoles(Arrays.asList(validRoles));
 	}
 
-	public void validateUserHasAllRoles(List<String> validRoles)
+	public static void validateUserHasAllRoles(List<String> validRoles)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		try
 		{
@@ -145,21 +150,21 @@ public class SecurityUtils
 		}
 	}
 
-	public void validateUserHasEvent(String eventName)
+	public static void validateUserHasEvent(String eventName)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		validateUserHasAnyEvent(new String[]{eventName});
 	}
 
-	public void validateUserHasAnyEvent(String[] events)
+	public static void validateUserHasAnyEvent(String[] events)
 	{
 		validateUserHasAnyEvent(Arrays.asList(events));
 	}
 
-	public void validateUserHasAnyEvent(List<String> events)
+	public static void validateUserHasAnyEvent(List<String> events)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		try
 		{
@@ -175,14 +180,14 @@ public class SecurityUtils
 	}
 
 
-	public void validateUserHasAllEvents(String[] validEvents)
+	public static void validateUserHasAllEvents(String[] validEvents)
 	{
 		validateUserHasAllEvents(Arrays.asList(validEvents));
 	}
 
-	public void validateUserHasAllEvents(List<String> validEvents)
+	public static void validateUserHasAllEvents(List<String> validEvents)
 	{
-		validateUserIsSignedIntoApp();
+		validateUserIsSignedIn();
 
 		try
 		{
@@ -197,7 +202,7 @@ public class SecurityUtils
 		}
 	}
 
-	private void validateSecurityContextHasCredentials()
+	public static void validateSecurityContextHasCredentials()
 	{
 		if (!SecurityContextHolder.getContextOptional().isPresent())
 		{
@@ -217,7 +222,7 @@ public class SecurityUtils
 		}
 	}
 
-	private SecurityToken getThreadSecurityToken()
+	public static SecurityToken getThreadSecurityToken()
 	{
 		return SecurityContextHolder.getContext().getSecurityToken();
 	}

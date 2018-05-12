@@ -73,7 +73,7 @@ public class TessaIAMServiceClient
 
 	public String retrieveAuthenticationTokenForUserInContext()
 	{
-		securityUtils.validateUserIsSignedIntoApp();
+		securityUtils.validateUserIsSignedIn();
 
 		Token authToken = client.get("/token/authorization", tokenEndpointUrl, Token.class);
 
