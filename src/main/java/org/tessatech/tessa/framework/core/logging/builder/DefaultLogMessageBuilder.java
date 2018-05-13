@@ -63,6 +63,8 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 		JsonObject logMessage = new JsonObject();
 
+
+
 		if (TransactionContextHolder.getContextOptional().isPresent())
 		{
 			addTransactionContextFields(TransactionContextHolder.getContextOptional(), logMessage);
@@ -81,13 +83,13 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 		{
 			addResponseFields(responseEntity.getBody(), logMessage);
 		}
-		else if (responseEntity != null)
+
+		if (responseEntity != null && !logMessage.has("response"))
 		{
 			JsonObject res = new JsonObject();
 			addIfNotNull(res, "httpStatusCode", responseEntity.getStatusCodeValue());
 			logMessage.add("response", res);
 		}
-
 
 		return gson.toJson(logMessage);
 	}
