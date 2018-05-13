@@ -149,6 +149,12 @@ public class RequestValidationUtilsTest
 		util.isEqualTo("TestField", 5, 5);
 	}
 
+	@Test
+	public void isEqualTo_EqualUUIDs()
+	{
+		util.isEqualTo("TestField", "505c2836-f3cc-427f-9ef0-737207ff9a0a", "505c2836-f3cc-427f-9ef0-737207ff9a0a");
+	}
+
 	@Test(expected = ValidationException.class)
 	public void isLessThanOrEqualTo_GreaterThan()
 	{

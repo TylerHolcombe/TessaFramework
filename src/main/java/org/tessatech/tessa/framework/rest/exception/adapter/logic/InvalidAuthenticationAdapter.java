@@ -31,7 +31,7 @@ public class InvalidAuthenticationAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.INVALID_AUTHENTICATION_HTTP_STATUS;
 	}

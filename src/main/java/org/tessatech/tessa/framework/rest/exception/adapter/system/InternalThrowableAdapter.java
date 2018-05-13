@@ -31,7 +31,7 @@ public class InternalThrowableAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.INTERNAL_ERROR_HTTP_STATUS;
 	}

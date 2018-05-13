@@ -83,7 +83,7 @@ public class RestServiceMapper
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		if (details instanceof RestThrowableAdapter)
 		{
-			status = ((RestThrowableAdapter) details).getHttpStatus();
+			status = ((RestThrowableAdapter) details).getHttpStatus(throwable);
 		}
 
 		TessaError tessaError = new TessaError(status.value(), details.getExceptionCode(throwable),

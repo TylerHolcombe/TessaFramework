@@ -28,6 +28,6 @@ public abstract class RestThrowableAdapter extends ThrowableAdapter
 		super(true, ArrayUtils.add(exceptionClasses, exceptionClass));
 	}
 
-	public abstract HttpStatus getHttpStatus();
+	public abstract HttpStatus getHttpStatus(Throwable throwable);
 
 }

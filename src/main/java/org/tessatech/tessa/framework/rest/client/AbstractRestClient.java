@@ -16,7 +16,7 @@
 
 package org.tessatech.tessa.framework.rest.client;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import io.atlassian.fugue.Either;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,11 +34,12 @@ import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttribute
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
 
 import java.net.URI;
+import java.util.Date;
 
 public abstract class AbstractRestClient<ErrorResponse>
 {
 	private static final Logger logger = LogManager.getLogger(TessaIAMServiceClient.class);
-	private static final Gson gson = new Gson();
+	private static final Gson gson = buildGson();
 
 	private String systemName;
 	private String serviceName;
@@ -205,5 +206,13 @@ public abstract class AbstractRestClient<ErrorResponse>
 		return Either.right(gson.fromJson(responseEntity.getBody(), successClass));
 	}
 
-
+	private static Gson buildGson()
+	{
+		return new GsonBuilder()
+				.registerTypeAdapter(Date.class,
+						(JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
+				.registerTypeAdapter(Date.class,
+						(JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
+				.create();
+	}
 }

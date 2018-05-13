@@ -36,7 +36,7 @@ public class DatabaseThrowableAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.DATABASE_ERROR_HTTP_STATUS;
 	}

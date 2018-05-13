@@ -31,7 +31,7 @@ public class DataNotFoundAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.NOT_FOUND_HTTP_STATUS;
 	}

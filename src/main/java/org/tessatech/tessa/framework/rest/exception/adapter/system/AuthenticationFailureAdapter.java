@@ -31,7 +31,7 @@ public class AuthenticationFailureAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.AUTH_FAILURE_HTTP_STATUS;
 	}

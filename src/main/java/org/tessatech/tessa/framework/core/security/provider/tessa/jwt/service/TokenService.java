@@ -79,7 +79,7 @@ public class TokenService
 				.withClaim("appName", appName)
 				.withClaim("username", userName)
 				.withArrayClaim("userRoles", userRoles)
-				.withArrayClaim("userEvents", userRoles)
+				.withArrayClaim("userEvents", userEvents)
 				.sign(currentAlgorithm);
 	}
 
@@ -96,7 +96,7 @@ public class TokenService
 		String appName = decodedToken.getClaim("appName").asString();
 		String username = decodedToken.getClaim("username").asString();
 		String[] userRoles = decodedToken.getClaim("userRoles").asArray(String.class);
-		String[] userEvents = decodedToken.getClaim("userRoles").asArray(String.class);
+		String[] userEvents = decodedToken.getClaim("userEvents").asArray(String.class);
 
 		if (type.equals(JWTTokenType.AUTHORIZATION))
 		{

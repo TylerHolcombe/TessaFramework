@@ -33,7 +33,7 @@ public class ExternalTimeoutThrowableAdapter extends RestThrowableAdapter implem
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.EXTERNAL_TIMEOUT_HTTP_STATUS;
 	}

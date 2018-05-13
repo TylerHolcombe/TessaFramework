@@ -33,7 +33,7 @@ public class UnknownThrowableAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.UNKNOWN_ERROR_HTTP_STATUS;
 	}

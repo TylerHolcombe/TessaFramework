@@ -31,7 +31,7 @@ public class NotImplementedAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.NOT_IMPLEMENTED_HTTP_STATUS;
 	}

@@ -255,7 +255,7 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 			if(adapter instanceof RestThrowableAdapter)
 			{
-				addIfNotNull(response, "httpStatusCode", ((RestThrowableAdapter) adapter).getHttpStatus());
+				addIfNotNull(response, "httpStatusCode", ((RestThrowableAdapter) adapter).getHttpStatus(throwable));
 			}
 
 			logMessage.add("response", response);

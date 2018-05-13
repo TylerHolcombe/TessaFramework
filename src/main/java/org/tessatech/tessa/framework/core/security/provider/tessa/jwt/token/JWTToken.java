@@ -174,6 +174,7 @@ public class JWTToken implements SecurityToken
 				this.events = token.events;
 				this.tokenId = token.tokenId;
 				this.rawTokenText = token.rawTokenText;
+				return;
 			}
 
 			throw new InternalException(

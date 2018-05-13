@@ -19,6 +19,7 @@ package org.tessatech.tessa.framework.core.util.validation;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.springframework.util.NumberUtils;
 import org.tessatech.tessa.framework.core.exception.system.InternalException;
+import org.tessatech.tessa.framework.core.logging.context.LoggingContextHolder;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -138,6 +139,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != 1)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum value is greater than " + testValue);
 		}
 		return this;
@@ -152,6 +154,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) < 0)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum is " + testValue);
 		}
 		return this;
@@ -165,6 +168,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != 0)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The only acceptable value was " + testValue);
 		}
 		return this;
@@ -178,6 +182,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) == 0)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The non-acceptable value was " + testValue);
 		}
 		return this;
@@ -191,6 +196,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != -1)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum value is less than " + testValue);
 		}
 		return this;
@@ -205,6 +211,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) > 0)
 		{
+			logFailedValidation(fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum is: " + testValue);
 		}
 		return this;
@@ -421,5 +428,16 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
+	private void logFailedValidation(Object fieldValue)
+	{
+		String failedComparison = "Failed Validation [" + (fieldValue != null ? fieldValue.toString() : null) + "]";
+		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addEvent(failedComparison));
+	}
+
+	private void logFailedValidation(Object fieldValue, Object testValue)
+	{
+		String failedComparison = "Failed Validation [" + (fieldValue != null ? fieldValue.toString() : null) + ":" + testValue + "]";
+		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addEvent(failedComparison));
+	}
 
 }

@@ -19,7 +19,9 @@ package org.tessatech.tessa.framework.rest.client;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.tessatech.tessa.framework.core.exception.system.ExternalException;
+import org.tessatech.tessa.framework.core.exception.system.RethrownTessaExternalException;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
 import org.tessatech.tessa.framework.core.security.context.SecurityContextHolder;
 import org.tessatech.tessa.framework.rest.util.RestUtils;
@@ -88,6 +90,12 @@ public class TessaRestClient extends AbstractRestClient<TessaErrorResponse>
 	protected ExternalException convertErrorIntoException(TessaErrorResponse tessaErrorResponse)
 	{
 		TessaError error = tessaErrorResponse.getError();
+
+		HttpStatus status = HttpStatus.valueOf(error.httpStatus);
+		if(status.is4xxClientError())
+		{
+			return new RethrownTessaExternalException(error.httpStatus, error.errorCode, error.errorMessage);
+		}
 
 		return new ExternalException(String.valueOf(error.errorCode), error.errorMessage);
 	}

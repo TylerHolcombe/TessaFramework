@@ -31,7 +31,7 @@ public class RemovedThrowableAdapter extends RestThrowableAdapter
 	}
 
 	@Override
-	public HttpStatus getHttpStatus()
+	public HttpStatus getHttpStatus(Throwable throwable)
 	{
 		return TessaExceptionCodes.REMOVED_HTTP_STATUS;
 	}
