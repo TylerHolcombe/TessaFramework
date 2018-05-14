@@ -56,6 +56,7 @@ public abstract class AbstractValidationUtils
 	{
 		if (fieldValue == null)
 		{
+			logFailedValidation(fieldName, fieldValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was null.");
 		}
 
@@ -68,6 +69,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.isEmpty())
 		{
+			logFailedValidation(fieldName, fieldValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " is empty.");
 		}
 
@@ -80,6 +82,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.trim().isEmpty())
 		{
+			logFailedValidation(fieldName, fieldValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " is trimmed empty.");
 		}
 
@@ -139,7 +142,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != 1)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum value is greater than " + testValue);
 		}
 		return this;
@@ -154,7 +157,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) < 0)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too small. The minimum is " + testValue);
 		}
 		return this;
@@ -168,7 +171,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != 0)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The only acceptable value was " + testValue);
 		}
 		return this;
@@ -182,7 +185,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) == 0)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was invalid. The non-acceptable value was " + testValue);
 		}
 		return this;
@@ -196,7 +199,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) != -1)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum value is less than " + testValue);
 		}
 		return this;
@@ -211,7 +214,7 @@ public abstract class AbstractValidationUtils
 
 		if (fieldValue.compareTo(testValue) > 0)
 		{
-			logFailedValidation(fieldValue, testValue);
+			logFailedValidation(fieldName, fieldValue, testValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was too large. The maximum is: " + testValue);
 		}
 		return this;
@@ -225,6 +228,7 @@ public abstract class AbstractValidationUtils
 
 		if (!testValues.contains(fieldValue))
 		{
+			logFailedValidation(fieldName, fieldValue, testValues);
 			throw generateExceptionForMessage("Field: " + fieldName + " did not contain an acceptable value. Acceptable values are: " + Arrays.toString(testValues.toArray()));
 		}
 		return this;
@@ -243,6 +247,7 @@ public abstract class AbstractValidationUtils
 
 		if(fieldValue.isEmpty())
 		{
+			logFailedValidation(fieldName, fieldValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was empty.");
 		}
 
@@ -255,6 +260,7 @@ public abstract class AbstractValidationUtils
 
 		if(fieldValue.length == 0)
 		{
+			logFailedValidation(fieldName, fieldValue);
 			throw generateExceptionForMessage("Field: " + fieldName + " was empty.");
 		}
 
@@ -269,6 +275,7 @@ public abstract class AbstractValidationUtils
 
 		if(!allValuesToMatch.containsAll(fieldValue))
 		{
+			logFailedValidation(fieldName, fieldValue, allValuesToMatch);
 			throw generateExceptionForMessage("Field: " + fieldName + " did not contain all the required values. Required values are: " + Arrays.toString(allValuesToMatch.toArray()));
 		}
 		return this;
@@ -295,6 +302,7 @@ public abstract class AbstractValidationUtils
 			}
 		}
 
+		logFailedValidation(fieldName, fieldValue, anyValueToMatch);
 		throw generateExceptionForMessage("Field: " + fieldName + " did not contain any of the required values. Required values are: " + Arrays.toString(anyValueToMatch.toArray()));
 
 	}
@@ -312,6 +320,7 @@ public abstract class AbstractValidationUtils
 
 		if(!value.booleanValue())
 		{
+			logFailedValidation(fieldName, value);
 			throw generateExceptionForMessage("Field: " + fieldName + " was false. Expected: true");
 		}
 
@@ -324,6 +333,7 @@ public abstract class AbstractValidationUtils
 
 		if(value.booleanValue())
 		{
+			logFailedValidation(fieldName, value);
 			throw generateExceptionForMessage("Field: " + fieldName + " was true. Expected: false");
 		}
 
@@ -349,6 +359,7 @@ public abstract class AbstractValidationUtils
 		}
 		catch (Exception e)
 		{
+			logFailedValidation(fieldName, fieldValue, numberClass);
 			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + numberClass.getSimpleName
 					(), e);
 		}
@@ -373,6 +384,7 @@ public abstract class AbstractValidationUtils
 		}
 		catch (Exception e)
 		{
+			logFailedValidation(fieldName, fieldValue, enumClass);
 			throw generateExceptionForMessage("Field: " + fieldName + " was not of type " + enumClass.getSimpleName(),
 					e);
 		}
@@ -384,6 +396,7 @@ public abstract class AbstractValidationUtils
 
 		if(!fieldValue.matches(sanatizationRegex.getRegex()))
 		{
+			logFailedValidation(fieldName, fieldValue, sanatizationRegex);
 			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
 		}
 		return this;
@@ -395,6 +408,7 @@ public abstract class AbstractValidationUtils
 
 		if(!fieldValue.matches(sanatizationRegex))
 		{
+			logFailedValidation(fieldName, fieldValue, sanatizationRegex);
 			throw generateExceptionForMessage("Field: " + fieldName + " has invalid characters.");
 		}
 
@@ -405,6 +419,7 @@ public abstract class AbstractValidationUtils
 	{
 		if (testValue == null)
 		{
+			logFailedValidation("TestValue", testValue);
 			throw new InternalException("Test value supplied to this validation is null.");
 		}
 		return this;
@@ -417,6 +432,7 @@ public abstract class AbstractValidationUtils
 
 		if (testValues.isEmpty())
 		{
+			logFailedValidation("TestValues", testValues);
 			throw new InternalException("The collection of test values supplied to this validation was empty.");
 		}
 
@@ -428,13 +444,13 @@ public abstract class AbstractValidationUtils
 		return this;
 	}
 
-	private void logFailedValidation(Object fieldValue)
+	private void logFailedValidation(String fieldName, Object fieldValue)
 	{
 		String failedComparison = "Failed Validation [" + (fieldValue != null ? fieldValue.toString() : null) + "]";
 		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addEvent(failedComparison));
 	}
 
-	private void logFailedValidation(Object fieldValue, Object testValue)
+	private void logFailedValidation(String fieldName, Object fieldValue, Object testValue)
 	{
 		String failedComparison = "Failed Validation [" + (fieldValue != null ? fieldValue.toString() : null) + ":" + testValue + "]";
 		LoggingContextHolder.getContextOptional().ifPresent(loggingContext -> loggingContext.addEvent(failedComparison));

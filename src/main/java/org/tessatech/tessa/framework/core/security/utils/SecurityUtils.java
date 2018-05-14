@@ -115,6 +115,7 @@ public class SecurityUtils
 	public static void validateUserHasAnyRole(List<String> roles)
 	{
 		validateUserIsSignedIn();
+		validateUserHasSecurityRoles();
 
 		try
 		{
@@ -127,6 +128,24 @@ public class SecurityUtils
 		}
 	}
 
+	private static void validateUserHasSecurityRoles()
+	{
+		if (getThreadSecurityToken() == null || getThreadSecurityToken().getRoles() == null || getThreadSecurityToken
+				().getRoles().length == 0)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for any of the necessary roles.");
+		}
+	}
+
+	private static void validateUserHasSecurityEvents()
+	{
+		if (getThreadSecurityToken() == null || getThreadSecurityToken().getEvents() == null ||
+				getThreadSecurityToken()
+				.getEvents().length == 0)
+		{
+			throw new InsufficientAuthorizationException("User is not authorized for any of the necessary roles.");
+		}
+	}
 
 	public static void validateUserHasAllRoles(String[] validRoles)
 	{
@@ -136,6 +155,7 @@ public class SecurityUtils
 	public static void validateUserHasAllRoles(List<String> validRoles)
 	{
 		validateUserIsSignedIn();
+		validateUserHasSecurityRoles();
 
 		try
 		{
@@ -165,6 +185,7 @@ public class SecurityUtils
 	public static void validateUserHasAnyEvent(List<String> events)
 	{
 		validateUserIsSignedIn();
+		validateUserHasSecurityEvents();
 
 		try
 		{
@@ -188,6 +209,7 @@ public class SecurityUtils
 	public static void validateUserHasAllEvents(List<String> validEvents)
 	{
 		validateUserIsSignedIn();
+		validateUserHasSecurityEvents();
 
 		try
 		{

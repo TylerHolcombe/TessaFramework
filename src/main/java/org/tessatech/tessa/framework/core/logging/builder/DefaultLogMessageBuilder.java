@@ -207,14 +207,21 @@ public class DefaultLogMessageBuilder implements LogMessageBuilder
 
 
 		JsonObject trace = new JsonObject();
-		addIfNotNull(trace, "requestId", transactionContext.getRequestId());
-		addIfNotNull(trace, "correlationId", transactionContext.getCorrelationId());
-		addIfNotNull(trace, "internalTraceId", transactionContext.getInternalTraceId());
-		addIfNotNull(trace, "sessionId", transactionContext.getSessionId());
-		addIfNotNull(trace, "sourceIp", transactionContext.getSourceIp());
-		addIfNotNull(trace, "clientIp", transactionContext.getClientIp());
-		addIfNotNull(trace, "deviceId", transactionContext.getDeviceId());
-		addIfNotNull(trace, "deviceType", transactionContext.getDeviceType());
+
+		JsonObject request = new JsonObject();
+		addIfNotNull(request, "requestId", transactionContext.getRequestId());
+		addIfNotNull(request, "correlationId", transactionContext.getCorrelationId());
+		addIfNotNull(request, "sessionId", transactionContext.getSessionId());
+		addIfNotNull(request, "sourceIp", transactionContext.getSourceIp());
+		addIfNotNull(request, "clientIp", transactionContext.getClientIp());
+		addIfNotNull(request, "deviceId", transactionContext.getDeviceId());
+		addIfNotNull(request, "deviceType", transactionContext.getDeviceType());
+		trace.add("request", request);
+
+		JsonObject response = new JsonObject();
+		addIfNotNull(response, "internalTraceId", transactionContext.getInternalTraceId());
+		trace.add("response", response);
+
 		logMessage.add("trace", trace);
 
 	}
