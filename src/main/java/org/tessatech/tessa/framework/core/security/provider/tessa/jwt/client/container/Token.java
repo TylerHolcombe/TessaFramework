@@ -16,10 +16,11 @@
 
 package org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @ApiModel(description = "An issued token to be used for Authorization and Authentication.")
 public class Token
@@ -34,8 +35,9 @@ public class Token
 	@ApiModelProperty(value = "The token to use on future API requests.")
 	public String token;
 
-	@ApiModelProperty(value = "The time-to-live (TTL) of the token in milliseconds.")
-	public Date expires;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	@ApiModelProperty(value = "The expiration date of this token.")
+	public ZonedDateTime expires;
 
 	@ApiModelProperty(value = "The type of token.", allowableValues = "IDENTITY,AUTHORIZATION")
 	public String type;

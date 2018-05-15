@@ -33,8 +33,12 @@ import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.logging.external.ExternalCallAttributesBuilder;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
 
+import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public abstract class AbstractRestClient<ErrorResponse>
 {
@@ -209,10 +213,9 @@ public abstract class AbstractRestClient<ErrorResponse>
 	private static Gson buildGson()
 	{
 		return new GsonBuilder()
-				.registerTypeAdapter(Date.class,
-						(JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-				.registerTypeAdapter(Date.class,
-						(JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
+				.registerTypeAdapter(ZonedDateTime.class,
+						(JsonDeserializer<ZonedDateTime>) (json, typeOfT, context) -> ZonedDateTime.parse(json.getAsJsonPrimitive().getAsString()))
+				.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 				.create();
 	}
 }

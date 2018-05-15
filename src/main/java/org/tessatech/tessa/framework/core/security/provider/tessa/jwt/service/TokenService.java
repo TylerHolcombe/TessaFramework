@@ -29,13 +29,13 @@ import org.tessatech.tessa.framework.core.exception.system.InternalException;
 import org.tessatech.tessa.framework.core.logging.annotation.LogRuntime;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.TessaIAMServiceClient;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.Secret;
-import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.client.container.Token;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.token.JWTToken;
 import org.tessatech.tessa.framework.core.security.provider.tessa.jwt.token.JWTTokenType;
 import org.tessatech.tessa.framework.core.util.validation.InternalValidationUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 
 @Component
 public class TokenService
@@ -54,12 +54,12 @@ public class TokenService
 	private Algorithm previousAlgorithm;
 	private JWTVerifier previousVerifier;
 
-	public String createIdentityToken(String userId, String appName, String userName, Date expiresAt)
+	public String createIdentityToken(String userId, String appName, String userName, ZonedDateTime expiresAt)
 	{
 		return JWT.create()
 				.withIssuer(jwtIssuer)
-				.withIssuedAt(new Date())
-				.withExpiresAt(expiresAt)
+				.withIssuedAt(java.util.Date.from(Instant.now()))
+				.withExpiresAt(java.util.Date.from(expiresAt.toInstant()))
 				.withClaim("type", JWTTokenType.IDENTITY.toString())
 				.withClaim("userId", userId)
 				.withClaim("appName", appName)
@@ -68,12 +68,12 @@ public class TokenService
 	}
 
 	public String createAuthorizationToken(String userId, String appName, String userName, String[] userRoles,
-			String[] userEvents, Date expiresAt)
+			String[] userEvents, ZonedDateTime expiresAt)
 	{
 		return JWT.create()
 				.withIssuer(jwtIssuer)
-				.withIssuedAt(new Date())
-				.withExpiresAt(expiresAt)
+				.withIssuedAt(java.util.Date.from(Instant.now()))
+				.withExpiresAt(java.util.Date.from(expiresAt.toInstant()))
 				.withClaim("type", JWTTokenType.AUTHORIZATION.toString())
 				.withClaim("userId", userId)
 				.withClaim("appName", appName)

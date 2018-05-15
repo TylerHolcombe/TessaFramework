@@ -23,7 +23,9 @@ import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.Date;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -33,16 +35,14 @@ public class Auditable
 	protected String createdBy;
 
 	@CreatedDate
-	@Temporal(TemporalType.TIMESTAMP)
-	protected Date createdDate;
+	protected Instant createdDate;
 
 	@LastModifiedBy
 	protected String lastModifiedBy;
 
 	@LastModifiedDate
-	@Temporal(TemporalType.TIMESTAMP)
 	@Version
-	protected Date lastModifiedDate;
+	protected Instant lastModifiedDate;
 
 	public String getCreatedBy()
 	{
@@ -54,12 +54,12 @@ public class Auditable
 		this.createdBy = createdBy;
 	}
 
-	public Date getCreatedDate()
+	public Instant getCreatedDate()
 	{
 		return createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate)
+	public void setCreatedDate(Instant createdDate)
 	{
 		this.createdDate = createdDate;
 	}
@@ -74,12 +74,12 @@ public class Auditable
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	public Date getLastModifiedDate()
+	public Instant getLastModifiedDate()
 	{
 		return lastModifiedDate;
 	}
 
-	public void setLastModifiedDate(Date lastModifiedDate)
+	public void setLastModifiedDate(Instant lastModifiedDate)
 	{
 		this.lastModifiedDate = lastModifiedDate;
 	}
