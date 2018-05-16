@@ -1,5 +1,5 @@
 # Tessa Framework
-##### _Development of the framework is currently in-progress. Major changes to the structure and API are still to come!_
+##### _Development of the framework is currently in-progress. Please expect major, breaking changes to the API!_
 
 The Tessa Framework is a small, *highly opinionated* set of annotations and utility code designed to simplify the development of RESTful Webservices and Event-based applications. 
 
