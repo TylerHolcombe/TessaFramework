@@ -49,7 +49,7 @@ We recommend building from source to stay up to date on the latest version. This
 $ mvn clean install
 ```
 
-## Support Reporting Issues
+## Support and Reporting Issues
 If you are having issues, please check out our documentation on the wiki. Otherwise, we are always happy to help out. Please report any issues or feature requests using GitHub's integrated tracking system.
 
 ## License
