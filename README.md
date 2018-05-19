@@ -4,7 +4,7 @@
 The Tessa Framework is a small, *highly opinionated* set of annotations and utility code designed to simplify the development of RESTful Webservices and Event-based applications. 
 
 The framework strives to present a set of core functionality with opinionated defaults to reduce, and in some cases eliminte, the boilerplate heavy burdens of configuration, transaction management, exception handling, security, and validations.
-
+ 
 
 #### Our Goals for the Framework, in Order of Importance, are:
 * Opinionated: Our intent is to provide a simple default way to rapidly achieve common functionality.
