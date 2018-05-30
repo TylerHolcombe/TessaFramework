@@ -28,7 +28,7 @@ The framework strives to present a set of core functionality with opinionated de
 * Utility classes for common functionality such as validations
 
 ## Installation and Using the Framework
-Detailed refrence documentation can be found in the wiki.
+Detailed reference documentation can be found in the wiki.
 
 To quickly import the framework into your project, add the following dependency into your pom:
 
